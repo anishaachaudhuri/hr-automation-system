@@ -39,3 +39,20 @@ def upload_resume(file: UploadFile = File(...)):
         "marks": marks,
         "preview": extracted_text[:500]
     }
+
+@app.get("/demo")
+def demo_resume():
+
+    file_path = "data/resumes/demo/demo1.pdf"
+
+    extracted_text = extract_text_from_pdf(file_path)
+
+    skills = extract_skills(extracted_text)
+    marks = extract_marks(extracted_text)
+
+    return {
+        "filename": "demo1.pdf",
+        "skills": skills,
+        "marks": marks,
+        "preview": extracted_text[:300]
+    }
