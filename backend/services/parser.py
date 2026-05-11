@@ -77,3 +77,44 @@ def extract_marks(text):
         "twelfth": twelfth,
         "gpa": gpa
     }
+
+def evaluate_candidate(text, marks):
+
+    text = text.lower()
+
+    gpa = marks.get("gpa")
+
+
+    if gpa is None or gpa < 8:
+        return {
+            "selected": False,
+            "reason": "CGPA below 8"
+        }
+
+
+    if "biotechnology" in text or "biotech" in text:
+        return {
+            "selected": False,
+            "reason": "Biotech branch not allowed"
+        }
+
+    
+    score = 0
+
+    research_keywords = [
+        "research",
+        "research paper",
+        "publication",
+        "journal",
+        "ieee"
+    ]
+
+    for keyword in research_keywords:
+        if keyword in text:
+            score += 10
+            break
+
+    return {
+        "selected": True,
+        "score": score
+    }

@@ -2,7 +2,12 @@ from fastapi import FastAPI, File, UploadFile
 import shutil
 import os
 import fitz
-from backend.services.parser import extract_skills, extract_marks
+from backend.services.parser import (
+    extract_skills,
+    extract_marks,
+    evaluate_candidate
+)
+
 
 app = FastAPI()
 
@@ -33,10 +38,13 @@ def upload_resume(file: UploadFile = File(...)):
     skills = extract_skills(extracted_text)
     marks = extract_marks(extracted_text)
 
+    evaluation = evaluate_candidate(extracted_text, marks)
+
     return {
         "filename": file.filename,
         "skills": skills,
         "marks": marks,
+        "evaluation": evaluation,
         "preview": extracted_text[:500]
     }
 
@@ -50,9 +58,12 @@ def demo_resume():
     skills = extract_skills(extracted_text)
     marks = extract_marks(extracted_text)
 
+    evaluation = evaluate_candidate(extracted_text, marks)
+
     return {
         "filename": "demo1.pdf",
         "skills": skills,
         "marks": marks,
+        "evaluation": evaluation,
         "preview": extracted_text[:300]
     }
