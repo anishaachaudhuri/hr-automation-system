@@ -78,43 +78,105 @@ def extract_marks(text):
         "gpa": gpa
     }
 
-def evaluate_candidate(text, marks):
+
+MINIMUM_GPA = 8.0
+
+DISALLOWED_BRANCHES = [
+    "biotechnology",
+    "biotech"
+]
+
+RESEARCH_KEYWORDS = [
+    "research",
+    "research paper",
+    "publication",
+    "journal",
+    "ieee",
+    "conference"
+]
+
+ACHIEVEMENT_KEYWORDS = [
+    "hackathon",
+    "winner",
+    "award",
+    "scholarship",
+    "achievement"
+]
+
+SCORING_WEIGHTS = {
+    "high_gpa": 30,
+    "skills": 25,
+    "research": 25,
+    "achievements": 20
+}
+
+
+def evaluate_candidate(text, marks, skills):
 
     text = text.lower()
 
+    score = 0
+    reasons = []
+
     gpa = marks.get("gpa")
 
-
-    if gpa is None or gpa < 8:
+    if gpa is None or gpa < MINIMUM_GPA:
         return {
             "selected": False,
-            "reason": "CGPA below 8"
+            "score": 0,
+            "reasons": [
+                f"GPA below minimum cutoff ({MINIMUM_GPA})"
+            ]
         }
 
+    if gpa >= 9:
+        score += SCORING_WEIGHTS["high_gpa"]
+        reasons.append("Excellent GPA detected")
 
-    if "biotechnology" in text or "biotech" in text:
-        return {
-            "selected": False,
-            "reason": "Biotech branch not allowed"
-        }
+    elif gpa >= 8:
+        score += 20
+        reasons.append("Good academic performance")
 
-    
-    score = 0
+    for branch in DISALLOWED_BRANCHES:
+        if branch in text:
+            return {
+                "selected": False,
+                "score": 0,
+                "reasons": [
+                    f"Disallowed branch detected: {branch}"
+                ]
+            }
 
-    research_keywords = [
-        "research",
-        "research paper",
-        "publication",
-        "journal",
-        "ieee"
-    ]
+    skill_score = min(len(skills) * 3, SCORING_WEIGHTS["skills"])
 
-    for keyword in research_keywords:
+    if skill_score > 0:
+        score += skill_score
+        reasons.append("Strong technical skill match")
+
+    research_found = False
+
+    for keyword in RESEARCH_KEYWORDS:
         if keyword in text:
-            score += 10
+            research_found = True
             break
+
+    if research_found:
+        score += SCORING_WEIGHTS["research"]
+        reasons.append("Research experience detected")
+
+    achievement_found = False
+
+    for keyword in ACHIEVEMENT_KEYWORDS:
+        if keyword in text:
+            achievement_found = True
+            break
+
+    if achievement_found:
+        score += SCORING_WEIGHTS["achievements"]
+        reasons.append("Achievements/certifications detected")
 
     return {
         "selected": True,
-        "score": score
+        "score": score,
+        "reasons": reasons
     }
