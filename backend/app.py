@@ -1,4 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+
 import shutil
 import os
 import fitz
@@ -17,49 +19,83 @@ from backend.services.parser import (
 
 app = FastAPI()
 
-# create database table on startup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 create_table()
 
 UPLOAD_FOLDER = "data/resumes"
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True
+)
 
 
 @app.get("/")
 def home():
-    return {"message": "HR System Running"}
+
+    return {
+        "message": "HR System Running"
+    }
 
 
 def extract_text_from_pdf(file_path):
 
     doc = fitz.open(file_path)
+
     text = ""
 
     for page in doc:
+
         text += page.get_text()
 
     return text
 
 
 @app.post("/upload")
-def upload_resume(file: UploadFile = File(...)):
+def upload_resume(
+    file: UploadFile = File(...)
+):
 
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file_path = os.path.join(
+        UPLOAD_FOLDER,
+        file.filename
+    )
 
-    # save uploaded file
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    with open(
+        file_path,
+        "wb"
+    ) as buffer:
 
-    # extract text
-    extracted_text = extract_text_from_pdf(file_path)
+        shutil.copyfileobj(
+            file.file,
+            buffer
+        )
 
-    # extract skills and marks
-    skills = extract_skills(extracted_text)
-    marks = extract_marks(extracted_text)
+    extracted_text = extract_text_from_pdf(
+        file_path
+    )
 
-    # evaluate candidate
-    evaluation = evaluate_candidate(extracted_text, marks)
+    skills = extract_skills(
+        extracted_text
+    )
 
-    # create final result object
+    marks = extract_marks(
+        extracted_text
+    )
+
+    evaluation = evaluate_candidate(
+        extracted_text,
+        marks,
+        skills
+    )
+
     result = {
         "filename": file.filename,
         "skills": skills,
@@ -68,7 +104,6 @@ def upload_resume(file: UploadFile = File(...)):
         "preview": extracted_text[:500]
     }
 
-    # save candidate to database
     save_candidate(result)
 
     return result
@@ -79,12 +114,23 @@ def demo_resume():
 
     file_path = "data/demo/demo1.pdf"
 
-    extracted_text = extract_text_from_pdf(file_path)
+    extracted_text = extract_text_from_pdf(
+        file_path
+    )
 
-    skills = extract_skills(extracted_text)
-    marks = extract_marks(extracted_text)
+    skills = extract_skills(
+        extracted_text
+    )
 
-    evaluation = evaluate_candidate(extracted_text, marks)
+    marks = extract_marks(
+        extracted_text
+    )
+
+    evaluation = evaluate_candidate(
+        extracted_text,
+        marks,
+        skills
+    )
 
     result = {
         "filename": "demo1.pdf",
@@ -101,12 +147,18 @@ def demo_resume():
 def get_candidates():
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM candidates")
+    cursor.execute(
+        "SELECT * FROM candidates"
+    )
 
     candidates = cursor.fetchall()
 
     conn.close()
 
-    return [dict(candidate) for candidate in candidates]
+    return [
+        dict(candidate)
+        for candidate in candidates
+    ]
