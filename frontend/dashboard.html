@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        HR Automation Dashboard
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/dashboard.css"
+    >
+
+</head>
+<body>
+
+    <div class="dashboard">
+
+        <aside class="sidebar">
+
+            <div class="sidebar-top">
+
+                <img
+                    src="/static/assets/DRDO-logo.png"
+                    alt="Logo"
+                >
+
+                <h2>
+                    HR Automation
+                </h2>
+
+                <p>
+                    Candidate Management System
+                </p>
+
+            </div>
+
+            <nav>
+
+                <button onclick="loadPage('upload')">
+                    Upload Resume
+                </button>
+
+                <button onclick="loadPage('results')">
+                    Candidate Results
+                </button>
+
+                <button onclick="loadPage('requirements')">
+                    Requirements
+                </button>
+
+                <button onclick="loadPage('allocation')">
+                    Allocation
+                </button>
+
+            </nav>
+
+        </aside>
+
+        <main id="content"></main>
+
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+
+</body>
+</html>

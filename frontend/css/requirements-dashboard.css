@@ -1,0 +1,97 @@
+.requirements-dashboard{
+    width:100%;
+}
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.dashboard-header h1{
+    color:#18489c;
+    font-size:34px;
+    margin-bottom:8px;
+}
+
+.dashboard-header p{
+    color:#64748b;
+}
+
+.dashboard-header button{
+    padding:14px 24px;
+    background:#dc2626;
+    color:white;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+.config-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:24px;
+}
+
+.config-card{
+    background:white;
+    padding:28px;
+    border-radius:22px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.config-card h2{
+    color:#18489c;
+    margin-bottom:20px;
+    font-size:24px;
+}
+
+.config-card label{
+    display:block;
+    margin-top:14px;
+    margin-bottom:8px;
+    font-weight:bold;
+}
+
+.config-card input,
+.config-card textarea{
+    width:100%;
+    padding:14px;
+    border:1px solid #cbd5e1;
+    border-radius:14px;
+    font-size:15px;
+}
+
+.full-width{
+    grid-column:1/-1;
+}
+
+.save-btn{
+    margin-top:30px;
+    padding:16px 28px;
+    background:#18489c;
+    color:white;
+    border:none;
+    border-radius:16px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#saveToast{
+    position:fixed;
+    bottom:30px;
+    right:30px;
+    background:#16a34a;
+    color:white;
+    padding:16px 22px;
+    border-radius:14px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.3s;
+}
+
+#saveToast.show{
+    opacity:1;
+}

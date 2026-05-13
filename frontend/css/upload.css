@@ -1,0 +1,56 @@
+.upload-card{
+    background:white;
+    padding:35px;
+    border-radius:22px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+}
+
+.upload-card h1{
+    color:#18489c;
+    margin-bottom:12px;
+}
+
+.subtext{
+    color:#64748b;
+    margin-bottom:25px;
+}
+
+input[type="file"]{
+    width:100%;
+    padding:18px;
+    border:2px dashed #18489c;
+    border-radius:16px;
+    background:#f8fbff;
+}
+
+.upload-card button{
+    margin-top:20px;
+    padding:15px 28px;
+    background:#18489c;
+    color:white;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+}
+
+#status{
+    margin-top:20px;
+    font-weight:bold;
+    color:#18489c;
+}
+
+.result-box{
+    margin-top:25px;
+    background:#f8fbff;
+    padding:25px;
+    border-radius:18px;
+}
+
+.result-box h3{
+    color:#18489c;
+    margin-bottom:15px;
+}
+
+.result-box p{
+    margin-bottom:12px;
+}

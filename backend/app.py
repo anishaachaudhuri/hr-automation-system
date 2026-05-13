@@ -1,9 +1,32 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import (
+    FastAPI,
+    File,
+    UploadFile,
+    Form,
+    Request,
+    HTTPException
+)
+
 from fastapi.middleware.cors import CORSMiddleware
+
+from fastapi.staticfiles import StaticFiles
+
+from fastapi.responses import FileResponse
+
+from starlette.middleware.sessions import SessionMiddleware
 
 import shutil
 import os
 import fitz
+
+from backend.auth_db import (
+    create_auth_tables,
+    create_default_admin,
+    create_default_requirements,
+    verify_admin,
+    get_requirements,
+    update_requirements
+)
 
 from backend.database import (
     create_table,
@@ -27,7 +50,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="super-secret-key"
+)
+
+app.mount(
+    "/static",
+    StaticFiles(directory="frontend"),
+    name="static"
+)
+
 create_table()
+
+create_auth_tables()
+
+create_default_admin()
+
+create_default_requirements()
 
 UPLOAD_FOLDER = "data/resumes"
 
@@ -42,6 +82,102 @@ def home():
 
     return {
         "message": "HR System Running"
+    }
+
+
+@app.get("/dashboard")
+def dashboard():
+
+    return FileResponse(
+        "frontend/dashboard.html"
+    )
+
+
+@app.post("/login")
+def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
+
+    valid = verify_admin(
+        username,
+        password
+    )
+
+    if not valid:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials"
+        )
+
+    request.session["admin"] = username
+
+    return {
+        "success": True,
+        "username": username
+    }
+
+
+@app.post("/logout")
+def logout(request: Request):
+
+    request.session.clear()
+
+    return {
+        "message": "Logged out"
+    }
+
+
+@app.get("/auth-status")
+def auth_status(request: Request):
+
+    admin = request.session.get("admin")
+
+    return {
+        "authenticated": bool(admin),
+        "username": admin
+    }
+
+
+@app.get("/requirements")
+def requirements(request: Request):
+
+    admin = request.session.get("admin")
+
+    if not admin:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
+    return get_requirements()
+
+
+@app.put("/requirements")
+def save_requirements(
+    request: Request,
+    data: dict
+):
+
+    admin = request.session.get("admin")
+
+    if not admin:
+
+        raise HTTPException(
+            status_code=401,
+            detail="Unauthorized"
+        )
+
+    update_requirements(
+        data,
+        admin
+    )
+
+    return {
+        "message": "Requirements updated successfully"
     }
 
 

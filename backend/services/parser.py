@@ -1,74 +1,103 @@
 import re
-from backend.utils.skills import SKILL_KEYWORDS
+
+from backend.utils.skills import (
+    SKILL_KEYWORDS
+)
+
+from backend.auth_db import (
+    get_requirements
+)
+
 
 def extract_skills(text):
+
     text = text.lower()
+
     found_skills = []
 
     for skill in SKILL_KEYWORDS:
+
         if skill in text:
+
             found_skills.append(skill)
 
     return list(set(found_skills))
 
+
 def extract_marks(text):
+
     text = text.lower()
 
     tenth = None
     twelfth = None
     gpa = None
 
-    # 10th patterns
     tenth_patterns = [
-        r"(10th|class x|secondary|ssc|cbse|icse).*?(\d{2,3}\.?\d?)\s?%",
-        r"(\d{2,3}\.?\d?)\s?%.*?(10th|class x|secondary)"
-    ]
+    r"(10th|class x|secondary|ssc|cbse|icse).*?(\d{2,3}\.?\d?)\s?%",
+    r"(\d{2,3}\.?\d?)\s?%.*?(10th|class x|secondary)"
+]
 
-    # 12th patterns
     twelfth_patterns = [
         r"(12th|class xii|senior secondary|hsc|isc|intermediate).*?(\d{2,3}\.?\d?)\s?%",
         r"(\d{2,3}\.?\d?)\s?%.*?(12th|class xii|senior secondary)"
     ]
 
-    # gpa patterns
     gpa_patterns = [
         r"(cgpa|gpa).*?(\d\.\d{1,2})",
         r"(\d\.\d{1,2}).*?(cgpa|gpa)"
     ]
 
     for pattern in tenth_patterns:
+
         match = re.search(pattern, text)
+
         if match:
+
             for group in match.groups():
+
                 try:
                     tenth = float(group)
                     break
+
                 except:
                     continue
+
         if tenth:
             break
 
     for pattern in twelfth_patterns:
+
         match = re.search(pattern, text)
+
         if match:
+
             for group in match.groups():
+
                 try:
                     twelfth = float(group)
                     break
+
                 except:
                     continue
+
         if twelfth:
             break
 
     for pattern in gpa_patterns:
+
         match = re.search(pattern, text)
+
         if match:
+
             for group in match.groups():
+
                 try:
                     gpa = float(group)
                     break
+
                 except:
                     continue
+
         if gpa:
             break
 
@@ -79,104 +108,179 @@ def extract_marks(text):
     }
 
 
-MINIMUM_GPA = 8.0
-
-DISALLOWED_BRANCHES = [
-    "biotechnology",
-    "biotech"
-]
-
-RESEARCH_KEYWORDS = [
-    "research",
-    "research paper",
-    "publication",
-    "journal",
-    "ieee",
-    "conference"
-]
-
-ACHIEVEMENT_KEYWORDS = [
-    "hackathon",
-    "winner",
-    "award",
-    "scholarship",
-    "achievement"
-]
-
-SCORING_WEIGHTS = {
-    "high_gpa": 30,
-    "skills": 25,
-    "research": 25,
-    "achievements": 20
-}
-
-
-def evaluate_candidate(text, marks, skills):
+def evaluate_candidate(
+    text,
+    marks,
+    skills
+):
 
     text = text.lower()
 
+    requirements = get_requirements()
+
+    minimum_gpa = (
+        requirements["minimum_gpa"]
+    )
+
+    required_skills = [
+
+        skill.strip().lower()
+
+        for skill in (
+            requirements["required_skills"] or ""
+        ).split(",")
+
+        if skill.strip()
+    ]
+
+    preferred_skills = [
+
+        skill.strip().lower()
+
+        for skill in (
+            requirements["preferred_skills"] or ""
+        ).split(",")
+
+        if skill.strip()
+    ]
+
+    disallowed_branches = [
+
+        branch.strip().lower()
+
+        for branch in (
+            requirements["disallowed_branches"] or ""
+        ).split(",")
+
+        if branch.strip()
+    ]
+
+    weights = {
+
+        "skills":
+            requirements["skill_weight"],
+
+        "gpa":
+            requirements["gpa_weight"],
+
+        "research":
+            requirements["research_weight"],
+
+        "achievement":
+            requirements["achievement_weight"]
+    }
+
     score = 0
+
     reasons = []
 
     gpa = marks.get("gpa")
 
-    if gpa is None or gpa < MINIMUM_GPA:
+    if gpa is None or gpa < minimum_gpa:
+
         return {
             "selected": False,
             "score": 0,
             "reasons": [
-                f"GPA below minimum cutoff ({MINIMUM_GPA})"
+                "GPA below threshold"
             ]
         }
 
-    if gpa >= 9:
-        score += SCORING_WEIGHTS["high_gpa"]
-        reasons.append("Excellent GPA detected")
+    score += (
+        (gpa / 10)
+        * weights["gpa"]
+    )
 
-    elif gpa >= 8:
-        score += 20
-        reasons.append("Good academic performance")
+    reasons.append(
+        "Academic score matched"
+    )
 
-    for branch in DISALLOWED_BRANCHES:
+    for branch in disallowed_branches:
+
         if branch in text:
+
             return {
                 "selected": False,
                 "score": 0,
                 "reasons": [
-                    f"Disallowed branch detected: {branch}"
+                    f"Disallowed branch: {branch}"
                 ]
             }
 
-    skill_score = min(len(skills) * 3, SCORING_WEIGHTS["skills"])
+    matched_required = 0
 
-    if skill_score > 0:
-        score += skill_score
-        reasons.append("Strong technical skill match")
+    for skill in required_skills:
 
-    research_found = False
+        if skill in skills:
 
-    for keyword in RESEARCH_KEYWORDS:
+            matched_required += 1
+
+    matched_preferred = 0
+
+    for skill in preferred_skills:
+
+        if skill in skills:
+
+            matched_preferred += 1
+
+    total_skill_score = (
+        matched_required * 8
+        + matched_preferred * 4
+    )
+
+    total_skill_score = min(
+        total_skill_score,
+        weights["skills"]
+    )
+
+    score += total_skill_score
+
+    if total_skill_score > 0:
+
+        reasons.append(
+            "Skill match detected"
+        )
+
+    research_keywords = [
+        "research",
+        "publication",
+        "ieee",
+        "journal"
+    ]
+
+    for keyword in research_keywords:
+
         if keyword in text:
-            research_found = True
+
+            score += weights["research"]
+
+            reasons.append(
+                "Research experience detected"
+            )
+
             break
 
-    if research_found:
-        score += SCORING_WEIGHTS["research"]
-        reasons.append("Research experience detected")
+    achievement_keywords = [
+        "winner",
+        "award",
+        "scholarship",
+        "hackathon"
+    ]
 
-    achievement_found = False
+    for keyword in achievement_keywords:
 
-    for keyword in ACHIEVEMENT_KEYWORDS:
         if keyword in text:
-            achievement_found = True
-            break
 
-    if achievement_found:
-        score += SCORING_WEIGHTS["achievements"]
-        reasons.append("Achievements/certifications detected")
+            score += weights["achievement"]
+
+            reasons.append(
+                "Achievements detected"
+            )
+
+            break
 
     return {
         "selected": True,
-        "score": score,
+        "score": round(score, 2),
         "reasons": reasons
     }

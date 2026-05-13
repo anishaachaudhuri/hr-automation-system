@@ -1,0 +1,136 @@
+<div class="requirements-dashboard">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <h1>
+                Requirement Configuration
+            </h1>
+
+            <p>
+                Configure candidate evaluation criteria
+            </p>
+
+        </div>
+
+        <button id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+    <div class="config-grid">
+
+        <div class="config-card">
+
+            <h2>
+                Academic Criteria
+            </h2>
+
+            <label for="minimumGpa">
+                Minimum GPA
+            </label>
+
+            <input
+                type="number"
+                id="minimumGpa"
+                step="0.1"
+            >
+
+        </div>
+
+        <div class="config-card">
+
+            <h2>
+                Score Weights
+            </h2>
+
+            <label for="skillWeight">
+                Skill Weight
+            </label>
+
+            <input
+                type="number"
+                id="skillWeight"
+            >
+
+            <label for="gpaWeight">
+                GPA Weight
+            </label>
+
+            <input
+                type="number"
+                id="gpaWeight"
+            >
+
+            <label for="researchWeight">
+                Research Weight
+            </label>
+
+            <input
+                type="number"
+                id="researchWeight"
+            >
+
+            <label for="achievementWeight">
+                Achievement Weight
+            </label>
+
+            <input
+                type="number"
+                id="achievementWeight"
+            >
+
+        </div>
+
+        <div class="config-card">
+
+            <h2>
+                Required Skills
+            </h2>
+
+            <textarea
+                id="requiredSkills"
+                rows="6"
+            ></textarea>
+
+        </div>
+
+        <div class="config-card">
+
+            <h2>
+                Preferred Skills
+            </h2>
+
+            <textarea
+                id="preferredSkills"
+                rows="6"
+            ></textarea>
+
+        </div>
+
+        <div class="config-card full-width">
+
+            <h2>
+                Disallowed Branches
+            </h2>
+
+            <textarea
+                id="disallowedBranches"
+                rows="4"
+            ></textarea>
+
+        </div>
+
+    </div>
+
+    <button id="saveBtn" class="save-btn">
+        Save Configuration
+    </button>
+
+    <div id="saveToast">
+        ✓ Configuration Saved
+    </div>
+
+</div>

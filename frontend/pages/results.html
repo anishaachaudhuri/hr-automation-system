@@ -1,0 +1,76 @@
+<div class="results-card">
+
+    <div class="results-header">
+
+        <h1>
+            Candidate Results
+        </h1>
+
+        <div class="controls">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search by filename or skill"
+            >
+
+            <button id="sortBtn">
+                Sort by Score
+            </button>
+
+            <div class="top-k-box">
+
+                <label for="topKInput">
+                    Top K
+                </label>
+
+                <input
+                    type="number"
+                    id="topKInput"
+                    value="3"
+                    min="1"
+                >
+
+            </div>
+
+            <div class="checkbox-box">
+
+                <input
+                    type="checkbox"
+                    id="selectedOnly"
+                >
+
+                <label for="selectedOnly">
+                    Selected Only
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Filename</th>
+                    <th>GPA</th>
+                    <th>Score</th>
+                    <th>Status</th>
+                    <th>Skills</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="candidateTableBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
