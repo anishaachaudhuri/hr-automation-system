@@ -1,7 +1,12 @@
 async function loadRequirementsPage() {
 
     const authResponse =
-        await fetch("/auth-status");
+        await fetch(
+            "/auth-status",
+            {
+                credentials: "include"
+            }
+        );
 
     const authData =
         await authResponse.json();
@@ -19,88 +24,116 @@ async function loadRequirementsPage() {
 async function loadLoginPage() {
 
     const content =
-        document.getElementById("content");
+        document.getElementById(
+            "content-area"
+        );
 
-    const response = await fetch(
-        "/static/pages/requirements-login.html"
-    );
+    if (!content) {
+        return;
+    }
 
-    const html = await response.text();
+    const response =
+        await fetch(
+            "/static/pages/requirements-login.html"
+        );
+
+    const html =
+        await response.text();
 
     content.innerHTML = html;
-
-    loadDynamicCSS(
-        "/static/css/requirements-login.css"
-    );
 
     attachLoginHandler();
 }
 
 function attachLoginHandler() {
 
-    document
-        .getElementById("loginBtn")
-        .addEventListener(
-            "click",
-            async function () {
+    const loginBtn =
+        document.getElementById(
+            "loginBtn"
+        );
 
-                const formData =
-                    new FormData();
+    if (!loginBtn) {
+        return;
+    }
 
-                formData.append(
-                    "username",
-                    document.getElementById(
-                        "username"
-                    ).value
+    loginBtn.addEventListener(
+        "click",
+        async function () {
+
+            const username =
+                document.getElementById(
+                    "username"
+                ).value;
+
+            const password =
+                document.getElementById(
+                    "password"
+                ).value;
+
+            const formData =
+                new FormData();
+
+            formData.append(
+                "username",
+                username
+            );
+
+            formData.append(
+                "password",
+                password
+            );
+
+            const response =
+                await fetch(
+                    "/login",
+                    {
+                        method: "POST",
+                        body: formData,
+                        credentials: "include"
+                    }
                 );
 
-                formData.append(
-                    "password",
-                    document.getElementById(
-                        "password"
-                    ).value
-                );
+            if (!response.ok) {
 
-                const response =
-                    await fetch(
-                        "/login",
-                        {
-                            method: "POST",
-                            body: formData
-                        }
-                    );
-
-                if (!response.ok) {
-
+                const error =
                     document.getElementById(
                         "loginError"
-                    ).innerHTML =
-                        "Invalid credentials";
+                    );
 
-                    return;
+                if (error) {
+
+                    error.innerText =
+                        "Invalid username or password";
                 }
 
-                loadRequirementsDashboard();
+                return;
             }
-        );
+
+            loadRequirementsDashboard();
+        }
+    );
 }
 
 async function loadRequirementsDashboard() {
 
     const content =
-        document.getElementById("content");
+        document.getElementById(
+            "content-area"
+        );
 
-    const response = await fetch(
-        "/static/pages/requirements-dashboard.html"
-    );
+    if (!content) {
+        return;
+    }
 
-    const html = await response.text();
+    const response =
+        await fetch(
+            "/static/pages/requirements-dashboard.html"
+        );
+
+    const html =
+        await response.text();
 
     content.innerHTML = html;
-
-    loadDynamicCSS(
-        "/static/css/requirements-dashboard.css"
-    );
 
     loadRequirementData();
 
@@ -112,176 +145,201 @@ async function loadRequirementsDashboard() {
 async function loadRequirementData() {
 
     const response =
-        await fetch("/requirements");
+        await fetch(
+            "/requirements",
+            {
+                credentials: "include"
+            }
+        );
+
+    if (!response.ok) {
+        return;
+    }
 
     const data =
         await response.json();
 
     document.getElementById(
         "minimumGpa"
-    ).value = data.minimum_gpa;
+    ).value =
+        data.minimum_gpa || "";
 
     document.getElementById(
         "requiredSkills"
-    ).value = data.required_skills;
+    ).value =
+        data.required_skills || "";
 
     document.getElementById(
         "preferredSkills"
-    ).value = data.preferred_skills;
+    ).value =
+        data.preferred_skills || "";
 
     document.getElementById(
         "disallowedBranches"
-    ).value = data.disallowed_branches;
+    ).value =
+        data.disallowed_branches || "";
 
     document.getElementById(
         "skillWeight"
-    ).value = data.skill_weight;
+    ).value =
+        data.skill_weight || "";
 
     document.getElementById(
         "gpaWeight"
-    ).value = data.gpa_weight;
+    ).value =
+        data.gpa_weight || "";
 
     document.getElementById(
         "researchWeight"
-    ).value = data.research_weight;
+    ).value =
+        data.research_weight || "";
 
     document.getElementById(
         "achievementWeight"
-    ).value = data.achievement_weight;
+    ).value =
+        data.achievement_weight || "";
 }
 
 function attachSaveHandler() {
 
-    document
-        .getElementById("saveBtn")
-        .addEventListener(
-            "click",
-            async function () {
+    const saveBtn =
+        document.getElementById(
+            "saveBtn"
+        );
 
-                const payload = {
+    if (!saveBtn) {
+        return;
+    }
 
-                    minimum_gpa:
-                        parseFloat(
-                            document.getElementById(
-                                "minimumGpa"
-                            ).value
-                        ),
+    saveBtn.addEventListener(
+        "click",
+        async function () {
 
-                    required_skills:
+            const payload = {
+
+                minimum_gpa:
+                    parseFloat(
                         document.getElementById(
-                            "requiredSkills"
-                        ).value,
+                            "minimumGpa"
+                        ).value
+                    ),
 
-                    preferred_skills:
+                required_skills:
+                    document.getElementById(
+                        "requiredSkills"
+                    ).value,
+
+                preferred_skills:
+                    document.getElementById(
+                        "preferredSkills"
+                    ).value,
+
+                disallowed_branches:
+                    document.getElementById(
+                        "disallowedBranches"
+                    ).value,
+
+                skill_weight:
+                    parseFloat(
                         document.getElementById(
-                            "preferredSkills"
-                        ).value,
+                            "skillWeight"
+                        ).value
+                    ),
 
-                    disallowed_branches:
+                gpa_weight:
+                    parseFloat(
                         document.getElementById(
-                            "disallowedBranches"
-                        ).value,
+                            "gpaWeight"
+                        ).value
+                    ),
 
-                    skill_weight:
-                        parseFloat(
-                            document.getElementById(
-                                "skillWeight"
-                            ).value
-                        ),
+                research_weight:
+                    parseFloat(
+                        document.getElementById(
+                            "researchWeight"
+                        ).value
+                    ),
 
-                    gpa_weight:
-                        parseFloat(
-                            document.getElementById(
-                                "gpaWeight"
-                            ).value
-                        ),
+                achievement_weight:
+                    parseFloat(
+                        document.getElementById(
+                            "achievementWeight"
+                        ).value
+                    )
+            };
 
-                    research_weight:
-                        parseFloat(
-                            document.getElementById(
-                                "researchWeight"
-                            ).value
-                        ),
-
-                    achievement_weight:
-                        parseFloat(
-                            document.getElementById(
-                                "achievementWeight"
-                            ).value
-                        )
-                };
-
+            const response =
                 await fetch(
                     "/requirements",
                     {
                         method: "PUT",
+
                         headers: {
                             "Content-Type":
                                 "application/json"
                         },
-                        body: JSON.stringify(payload)
+
+                        credentials: "include",
+
+                        body:
+                            JSON.stringify(
+                                payload
+                            )
                     }
                 );
 
-                const toast =
-                    document.getElementById(
-                        "saveToast"
-                    );
+            if (!response.ok) {
+                alert(
+                    "Failed to save configuration"
+                );
+                return;
+            }
 
-                toast.classList.add("show");
+            const toast =
+                document.getElementById(
+                    "saveToast"
+                );
+
+            if (toast) {
+
+                toast.style.opacity = "1";
 
                 setTimeout(() => {
 
-                    toast.classList.remove(
-                        "show"
-                    );
+                    toast.style.opacity = "0";
 
                 }, 2000);
             }
-        );
+        }
+    );
 }
 
 function attachLogoutHandler() {
 
-    document
-        .getElementById("logoutBtn")
-        .addEventListener(
-            "click",
-            async function () {
-
-                await fetch(
-                    "/logout",
-                    {
-                        method: "POST"
-                    }
-                );
-
-                loadLoginPage();
-            }
-        );
-}
-
-function loadDynamicCSS(href) {
-
-    const oldStyles =
-        document.querySelectorAll(
-            ".dynamic-style"
+    const logoutBtn =
+        document.getElementById(
+            "logoutBtn"
         );
 
-    oldStyles.forEach(style =>
-        style.remove()
+    if (!logoutBtn) {
+        return;
+    }
+
+    logoutBtn.addEventListener(
+        "click",
+        async function () {
+
+            await fetch(
+                "/logout",
+                {
+                    method: "POST",
+                    credentials: "include"
+                }
+            );
+
+            loadLoginPage();
+        }
     );
-
-    const style =
-        document.createElement("link");
-
-    style.rel = "stylesheet";
-
-    style.href = href;
-
-    style.className = "dynamic-style";
-
-    document.head.appendChild(style);
 }
 
 loadRequirementsPage();

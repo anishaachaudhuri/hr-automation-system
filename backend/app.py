@@ -1,3 +1,5 @@
+from unittest import result
+
 from fastapi import (
     FastAPI,
     File,
@@ -38,6 +40,12 @@ from backend.services.parser import (
     extract_skills,
     extract_marks,
     evaluate_candidate
+)
+
+from backend.services.nlp_engine import (
+    extract_candidate_name,
+    extract_resume_sections,
+    semantic_project_match
 )
 
 app = FastAPI()
@@ -177,7 +185,8 @@ def save_requirements(
     )
 
     return {
-        "message": "Requirements updated successfully"
+        "message":
+            "Requirements updated successfully"
     }
 
 
@@ -218,6 +227,26 @@ def upload_resume(
         file_path
     )
 
+    candidate_name = extract_candidate_name(
+        extracted_text
+    )
+
+    sections = extract_resume_sections(
+        extracted_text
+    )
+
+    project_text = sections.get(
+        "projects",
+        ""
+    )
+
+    requirements = get_requirements()
+
+    semantic_profile = requirements.get(
+        "semantic_profile",
+        ""
+    )
+
     skills = extract_skills(
         extracted_text
     )
@@ -226,19 +255,35 @@ def upload_resume(
         extracted_text
     )
 
+    semantic_result = semantic_project_match(
+        sections,
+        semantic_profile
+    )
+
     evaluation = evaluate_candidate(
         extracted_text,
         marks,
-        skills
+        skills,
+        semantic_result
     )
 
     result = {
+        "name": candidate_name,
         "filename": file.filename,
         "skills": skills,
         "marks": marks,
+        "semantic_matching":
+            semantic_result,
+        "sections": {
+            "projects":
+                project_text[:500]
+        },
         "evaluation": evaluation,
-        "preview": extracted_text[:500]
+        "preview":
+            extracted_text[:500]
     }
+    print("UPLOAD RESULT:")
+    print(result)
 
     save_candidate(result)
 
@@ -254,6 +299,26 @@ def demo_resume():
         file_path
     )
 
+    candidate_name = extract_candidate_name(
+        extracted_text
+    )
+
+    sections = extract_resume_sections(
+        extracted_text
+    )
+
+    project_text = sections.get(
+        "projects",
+        ""
+    )
+
+    requirements = get_requirements()
+
+    semantic_profile = requirements.get(
+        "semantic_profile",
+        ""
+    )
+
     skills = extract_skills(
         extracted_text
     )
@@ -262,18 +327,32 @@ def demo_resume():
         extracted_text
     )
 
+    semantic_result = semantic_project_match(
+        sections,
+        semantic_profile
+    )
+
     evaluation = evaluate_candidate(
         extracted_text,
         marks,
-        skills
+        skills,
+        semantic_result
     )
 
     result = {
+        "name": candidate_name,
         "filename": "demo1.pdf",
         "skills": skills,
         "marks": marks,
+        "semantic_matching":
+            semantic_result,
+        "sections": {
+            "projects":
+                project_text[:500]
+        },
         "evaluation": evaluation,
-        "preview": extracted_text[:300]
+        "preview":
+            extracted_text[:500]
     }
 
     return result

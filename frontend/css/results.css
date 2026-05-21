@@ -1,85 +1,217 @@
-.results-card{
-    background:white;
-    padding:35px;
-    border-radius:22px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
+.results-page{
+    width:100%;
 }
 
 .results-header{
-    margin-bottom:25px;
+    background:white;
+    padding:30px;
+    border-radius:24px;
+    margin-bottom:30px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    box-shadow:0 4px 18px rgba(0,0,0,0.06);
 }
 
 .results-header h1{
+    font-size:42px;
     color:#18489c;
-    margin-bottom:20px;
+    margin-bottom:8px;
 }
 
-.controls{
+.results-header p{
+    color:#64748b;
+}
+
+.results-controls{
     display:flex;
-    flex-wrap:wrap;
-    gap:16px;
     align-items:center;
+    gap:25px;
+    flex-wrap:wrap;
 }
 
-.controls input[type="text"]{
-    flex:1;
-    min-width:250px;
-    padding:14px;
-    border-radius:12px;
-    border:1px solid #cbd5e1;
-}
-
-.controls button{
-    padding:14px 22px;
+.results-controls button{
+    padding:14px 24px;
     border:none;
-    border-radius:12px;
+    border-radius:14px;
     background:#18489c;
     color:white;
+    font-weight:600;
     cursor:pointer;
 }
 
-.top-k-box,
-.checkbox-box{
+.results-controls label{
     display:flex;
     align-items:center;
     gap:10px;
+    font-weight:600;
 }
 
-.top-k-box input{
-    width:80px;
-    padding:10px;
+.candidate-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(420px,1fr)
+        );
+
+    gap:28px;
 }
 
-.table-container{
-    overflow:auto;
+.candidate-card-ui{
+    background:white;
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 4px 18px rgba(0,0,0,0.06);
 }
 
-table{
+.candidate-top-ui{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+
+    margin-bottom:20px;
+}
+
+.candidate-top-ui h2{
+    color:#18489c;
+    margin-bottom:8px;
+}
+
+.candidate-score-ui{
+    font-size:30px;
+    font-weight:700;
+    color:#2563eb;
+
+    margin-bottom:25px;
+}
+
+.selected-pill{
+    background:#dcfce7;
+    color:#15803d;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    font-weight:700;
+}
+
+.rejected-pill{
+    background:#fee2e2;
+    color:#dc2626;
+
+    padding:10px 18px;
+
+    border-radius:999px;
+
+    font-weight:700;
+}
+
+.candidate-section-ui{
+    margin-top:22px;
+}
+
+.candidate-section-ui h3{
+    margin-bottom:12px;
+    color:#0f172a;
+}
+
+.skills-wrapper{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.skill-chip{
+    background:#dbeafe;
+    color:#1e3a8a;
+
+    padding:10px 14px;
+
+    border-radius:999px;
+
+    font-size:14px;
+    font-weight:600;
+}
+
+.candidate-section-ui ul{
+    padding-left:20px;
+}
+
+.candidate-section-ui li{
+    margin-bottom:10px;
+    color:#475569;
+}
+
+.table-wrapper{
+    width:100%;
+    overflow-x:auto;
+
+    background:white;
+    border-radius:24px;
+    padding:24px;
+
+    box-shadow:0 4px 18px rgba(0,0,0,0.06);
+}
+
+.table-wrapper table{
     width:100%;
     border-collapse:collapse;
 }
 
-thead{
+.table-wrapper thead{
     background:#18489c;
     color:white;
 }
 
-th,
-td{
+.table-wrapper th{
+    padding:18px;
+    text-align:left;
+    font-size:15px;
+    font-weight:700;
+}
+
+.table-wrapper td{
     padding:18px;
     border-bottom:1px solid #e2e8f0;
+    color:#334155;
+    vertical-align:top;
 }
 
-.top-k-highlight{
-    background:#dcfce7;
+.table-wrapper tr:hover{
+    background:#f8fbff;
 }
 
-.selected-status{
-    color:#16a34a;
-    font-weight:bold;
+.table-wrapper tbody tr:last-child td{
+    border-bottom:none;
 }
 
-.rejected-status{
-    color:#dc2626;
-    font-weight:bold;
+#viewSelector{
+    padding:12px 16px;
+    border-radius:14px;
+    border:1px solid #cbd5e1;
+    background:white;
+    font-size:15px;
+    outline:none;
+    cursor:pointer;
+}
+
+.top-highlight{
+    background:#dcfce7 !important;
+    border:2px solid #86efac;
+}
+
+.top-highlight-row{
+    background:#dcfce7 !important;
+}
+
+.top-k-input{
+    width:90px;
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #cbd5e1;
 }

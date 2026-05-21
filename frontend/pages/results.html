@@ -1,24 +1,37 @@
-<div class="results-card">
+<div class="results-page">
 
     <div class="results-header">
 
-        <h1>
-            Candidate Results
-        </h1>
+        <div>
 
-        <div class="controls">
+            <h1>
+                Candidate Results
+            </h1>
 
-            <input
-                type="text"
-                id="searchInput"
-                placeholder="Search by filename or skill"
-            >
+            <p>
+                AI-powered candidate evaluation overview
+            </p>
+
+        </div>
+
+        <div class="results-controls">
 
             <button id="sortBtn">
                 Sort by Score
             </button>
 
-            <div class="top-k-box">
+            <label>
+
+                Selected Only
+
+                <input
+                    type="checkbox"
+                    id="selectedOnly"
+                >
+
+            </label>
+
+            <div>
 
                 <label for="topKInput">
                     Top K
@@ -27,49 +40,30 @@
                 <input
                     type="number"
                     id="topKInput"
+                    class="top-k-input"
                     value="3"
                     min="1"
                 >
 
             </div>
 
-            <div class="checkbox-box">
+            <select id="viewSelector">
 
-                <input
-                    type="checkbox"
-                    id="selectedOnly"
-                >
+                <option value="card">
+                    Card View
+                </option>
 
-                <label for="selectedOnly">
-                    Selected Only
-                </label>
+                <option value="table">
+                    Table View
+                </option>
 
-            </div>
+            </select>
 
         </div>
 
     </div>
 
-    <div class="table-container">
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>Filename</th>
-                    <th>GPA</th>
-                    <th>Score</th>
-                    <th>Status</th>
-                    <th>Skills</th>
-                </tr>
-
-            </thead>
-
-            <tbody id="candidateTableBody">
-            </tbody>
-
-        </table>
+    <div id="candidateContainer">
 
     </div>
 

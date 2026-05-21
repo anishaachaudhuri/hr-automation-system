@@ -1,19 +1,24 @@
-const RESULTS_API = "";
-
 let candidates = [];
-let sortedDescending = true;
 
-async function fetchCandidates() {
+let currentView = "card";
+
+let sortDescending = true;
+
+let topK = 3;
+
+async function loadCandidates() {
 
     try {
 
-        const response = await fetch(
-            `${RESULTS_API}/candidates`
-        );
+        const response =
+            await fetch("/candidates");
 
-        candidates = await response.json();
+        candidates =
+            await response.json();
 
-        renderTable(candidates);
+        renderCandidates();
+
+        attachEvents();
 
     } catch (error) {
 
@@ -21,138 +26,354 @@ async function fetchCandidates() {
     }
 }
 
-function renderTable(data) {
+function attachEvents() {
 
-    const tableBody =
+    const viewSelector =
         document.getElementById(
-            "candidateTableBody"
+            "viewSelector"
         );
 
-    tableBody.innerHTML = "";
+    if (viewSelector) {
 
-    const topK = parseInt(
+        viewSelector.onchange =
+            function () {
+
+                currentView =
+                    this.value;
+
+                renderCandidates();
+            };
+    }
+
+    const sortBtn =
         document.getElementById(
-            "topKInput"
-        ).value
-    ) || 0;
+            "sortBtn"
+        );
 
-    const sortedData = [...data].sort(
-        (a, b) => b.score - a.score
-    );
+    if (sortBtn) {
 
-    data.forEach(candidate => {
+        sortBtn.onclick =
+            function () {
 
-        const row =
-            document.createElement("tr");
+                sortDescending =
+                    !sortDescending;
 
-        const candidateIndex =
-            sortedData.findIndex(
-                item => item.id === candidate.id
-            );
-
-        if (candidateIndex < topK) {
-            row.classList.add(
-                "top-k-highlight"
-            );
-        }
-
-        row.innerHTML = `
-
-            <td>${candidate.filename}</td>
-            <td>${candidate.gpa ?? "N/A"}</td>
-            <td>${candidate.score}</td>
-
-            <td>
-                <span class="${candidate.selected ? "selected-status" : "rejected-status"}">
-                    ${candidate.selected ? "SELECTED" : "REJECTED"}
-                </span>
-            </td>
-
-            <td>${candidate.skills}</td>
-        `;
-
-        tableBody.appendChild(row);
-    });
-}
-
-function searchCandidates() {
-
-    const query =
-        document.getElementById(
-            "searchInput"
-        ).value.toLowerCase();
+                renderCandidates();
+            };
+    }
 
     const selectedOnly =
         document.getElementById(
             "selectedOnly"
-        ).checked;
-
-    const filtered = candidates.filter(candidate => {
-
-        const filenameMatch =
-            candidate.filename
-            .toLowerCase()
-            .includes(query);
-
-        const skillsMatch =
-            (candidate.skills || "")
-            .toLowerCase()
-            .includes(query);
-
-        const selectionMatch =
-            selectedOnly
-            ? candidate.selected
-            : true;
-
-        return (
-            (filenameMatch || skillsMatch)
-            && selectionMatch
         );
-    });
 
-    renderTable(filtered);
+    if (selectedOnly) {
+
+        selectedOnly.onchange =
+            renderCandidates;
+    }
+
+    const topKInput =
+        document.getElementById(
+            "topKInput"
+        );
+
+    if (topKInput) {
+
+        topKInput.oninput =
+            function () {
+
+                topK =
+                    parseInt(this.value) || 3;
+
+                renderCandidates();
+            };
+    }
 }
 
-function sortByScore() {
+function getFilteredCandidates() {
 
-    sortedDescending = !sortedDescending;
+    let filtered =
+        [...candidates];
 
-    candidates.sort((a, b) => {
+    const selectedOnly =
+        document.getElementById(
+            "selectedOnly"
+        );
 
-        return sortedDescending
-            ? b.score - a.score
-            : a.score - b.score;
-    });
+    if (
+        selectedOnly &&
+        selectedOnly.checked
+    ) {
 
-    renderTable(candidates);
+        filtered =
+            filtered.filter(
+                c => c.selected
+            );
+    }
+
+    filtered.sort((a, b) =>
+
+        sortDescending
+        ? b.score - a.score
+        : a.score - b.score
+    );
+
+    return filtered;
 }
 
-fetchCandidates();
+function renderCandidates() {
 
-document
-    .getElementById("searchInput")
-    .addEventListener(
-        "input",
-        searchCandidates
-    );
+    const container =
+        document.getElementById(
+            "candidateContainer"
+        );
 
-document
-    .getElementById("selectedOnly")
-    .addEventListener(
-        "change",
-        searchCandidates
-    );
+    if (!container) {
+        return;
+    }
 
-document
-    .getElementById("sortBtn")
-    .addEventListener(
-        "click",
-        sortByScore
-    );
+    const filtered =
+        getFilteredCandidates();
 
-document
-    .getElementById("topKInput")
-    .addEventListener(
-        "input",
-        () => renderTable(candidates)
-    );
+    if (currentView === "table") {
+
+        renderTableView(
+            filtered,
+            container
+        );
+
+    } else {
+
+        renderCardView(
+            filtered,
+            container
+        );
+    }
+}
+
+function renderCardView(
+    data,
+    container
+) {
+
+    container.innerHTML =
+        `<div class="candidate-grid"></div>`;
+
+    const grid =
+        container.querySelector(
+            ".candidate-grid"
+        );
+
+    data.forEach((candidate, index) => {
+
+        const highlighted =
+            index < topK;
+
+        const skills =
+            candidate.skills
+            ? candidate.skills
+                .split(",")
+                .map(skill =>
+
+                    `<span class="skill-chip">
+                        ${skill.trim()}
+                    </span>`
+
+                )
+                .join("")
+            : "";
+
+        const reasons =
+            candidate.reasons
+            ? candidate.reasons
+                .split(",")
+                .map(reason =>
+
+                    `<li>${reason.trim()}</li>`
+
+                )
+                .join("")
+            : "";
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "candidate-card-ui";
+
+        if (highlighted) {
+
+            card.classList.add(
+                "top-highlight"
+            );
+        }
+
+        card.innerHTML = `
+
+            <div class="candidate-top-ui">
+
+                <div>
+
+                    <h2>
+                        ${candidate.name || "Unknown"}
+                    </h2>
+
+                    <p>
+                        GPA:
+                        ${candidate.gpa || "N/A"}
+                    </p>
+
+                </div>
+
+                <div class="
+                    ${candidate.selected
+                        ? "selected-pill"
+                        : "rejected-pill"}
+                ">
+
+                    ${candidate.selected
+                        ? "SELECTED"
+                        : "REJECTED"}
+
+                </div>
+
+            </div>
+
+            <div class="candidate-score-ui">
+
+                Score:
+                ${candidate.score}
+
+            </div>
+
+            <div class="candidate-section-ui">
+
+                <h3>
+                    Skills
+                </h3>
+
+                <div class="skills-wrapper">
+                    ${skills}
+                </div>
+
+            </div>
+
+            <div class="candidate-section-ui">
+
+                <h3>
+                    Evaluation Reasons
+                </h3>
+
+                <ul>
+                    ${reasons}
+                </ul>
+
+            </div>
+        `;
+
+        grid.appendChild(card);
+    });
+}
+
+function renderTableView(
+    data,
+    container
+) {
+
+    let tableHTML = `
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+
+                        <th>GPA</th>
+
+                        <th>Score</th>
+
+                        <th>Status</th>
+
+                        <th>Skills</th>
+
+                        <th>Reasons</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+    `;
+
+    data.forEach((candidate, index) => {
+
+        const highlighted =
+            index < topK;
+
+        tableHTML += `
+
+            <tr class="
+                ${highlighted
+                    ? "top-highlight-row"
+                    : ""}
+            ">
+
+                <td>
+                    ${candidate.name || "Unknown"}
+                </td>
+
+                <td>
+                    ${candidate.gpa || "N/A"}
+                </td>
+
+                <td>
+                    ${candidate.score}
+                </td>
+
+                <td>
+
+                    <span class="
+                        ${candidate.selected
+                            ? "selected-pill"
+                            : "rejected-pill"}
+                    ">
+
+                        ${candidate.selected
+                            ? "SELECTED"
+                            : "REJECTED"}
+
+                    </span>
+
+                </td>
+
+                <td>
+                    ${candidate.skills || ""}
+                </td>
+
+                <td>
+                    ${candidate.reasons || ""}
+                </td>
+
+            </tr>
+        `;
+    });
+
+    tableHTML += `
+
+                </tbody>
+
+            </table>
+
+        </div>
+    `;
+
+    container.innerHTML =
+        tableHTML;
+}
+
+loadCandidates();

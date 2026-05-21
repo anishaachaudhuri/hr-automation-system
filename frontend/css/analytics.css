@@ -1,0 +1,168 @@
+.analytics-page{
+    width:100%;
+}
+
+.analytics-header{
+    margin-bottom:35px;
+}
+
+.analytics-header h1{
+    font-size:42px;
+    color:#18489c;
+    margin-bottom:8px;
+}
+
+.analytics-header p{
+    font-size:17px;
+    color:#64748b;
+}
+
+.analytics-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+    align-items:stretch;
+}
+
+.chart-card,
+.stats-panel{
+    background:white;
+    border-radius:24px;
+    padding:30px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.06);
+
+    min-height:560px;
+}
+
+.chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:28px;
+}
+
+.chart-header h2{
+    font-size:28px;
+    color:#18489c;
+}
+
+.chart-header select{
+    padding:12px 16px;
+
+    border-radius:14px;
+
+    border:1px solid #cbd5e1;
+
+    background:#f8fbff;
+
+    font-size:15px;
+
+    outline:none;
+
+    cursor:pointer;
+}
+
+#analyticsChart{
+    width:100% !important;
+    height:420px !important;
+}
+
+.stats-panel{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.stats-panel h2{
+    font-size:28px;
+    color:#18489c;
+    margin-bottom:28px;
+}
+
+.stats-list{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+.stats-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding-bottom:16px;
+
+    border-bottom:1px solid #e2e8f0;
+}
+
+.stats-row span{
+    color:#475569;
+    font-size:16px;
+    font-weight:500;
+}
+
+.stats-row strong{
+    color:#2563eb;
+    font-size:30px;
+    font-weight:700;
+}
+
+.analytics-footer{
+    margin-top:32px;
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:30px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,0.06);
+}
+
+.summary-box{
+    margin-bottom:28px;
+}
+
+.summary-box h3{
+    font-size:24px;
+    color:#18489c;
+    margin-bottom:14px;
+}
+
+.summary-box p{
+    color:#475569;
+    line-height:1.8;
+    font-size:16px;
+}
+
+.export-buttons{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+}
+
+.export-buttons button{
+    padding:14px 22px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#18489c;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.25s;
+}
+
+.export-buttons button:hover{
+    background:#2563eb;
+}

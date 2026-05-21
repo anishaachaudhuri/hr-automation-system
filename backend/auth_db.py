@@ -1,7 +1,15 @@
 import sqlite3
 from passlib.context import CryptContext
+import os
 
-DB_NAME = "data/hr_system.db"
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
+
+DB_NAME = os.path.join(
+    BASE_DIR,
+    "../data/hr_system.db"
+)
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -31,6 +39,7 @@ def create_auth_tables():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS requirements (
         id INTEGER PRIMARY KEY,
+        semantic_profile TEXT,
         minimum_gpa REAL,
         required_skills TEXT,
         preferred_skills TEXT,
@@ -62,7 +71,7 @@ def create_default_admin():
     if not admin:
 
         hashed_password = pwd_context.hash(
-            "admin123"
+            "drdo123"
         )
 
         cursor.execute(
@@ -113,6 +122,7 @@ def create_default_requirements():
         cursor.execute("""
         INSERT INTO requirements (
             id,
+            semantic_profile,
             minimum_gpa,
             required_skills,
             preferred_skills,
@@ -123,9 +133,10 @@ def create_default_requirements():
             achievement_weight,
             updated_by
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             1,
+            "Looking for candidates with experience in machine learning, backend systems, APIs, research, scalable systems and intelligent applications.",
             8.0,
             "python,machine learning",
             "nlp,opencv",
@@ -160,11 +171,13 @@ def get_requirements():
 def update_requirements(data, username):
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
     cursor.execute("""
     UPDATE requirements
     SET
+        semantic_profile=?,
         minimum_gpa=?,
         required_skills=?,
         preferred_skills=?,
@@ -176,6 +189,7 @@ def update_requirements(data, username):
         updated_by=?
     WHERE id=1
     """, (
+        data["semantic_profile"],
         data["minimum_gpa"],
         data["required_skills"],
         data["preferred_skills"],

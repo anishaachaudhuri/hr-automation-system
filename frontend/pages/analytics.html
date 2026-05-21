@@ -1,0 +1,165 @@
+<div class="analytics-page">
+
+    <div class="analytics-header">
+
+        <h1>
+            Recruitment Analytics
+        </h1>
+
+        <p>
+            AI-powered HR screening insights
+        </p>
+
+    </div>
+
+    <div class="analytics-grid">
+
+        <div class="chart-card">
+
+            <div class="chart-header">
+
+                <h2>
+                    Analytics Overview
+                </h2>
+
+                <select id="analyticsType">
+
+                    <option value="selection">
+                        Selection Distribution
+                    </option>
+
+                    <option value="skills">
+                        Top Skills
+                    </option>
+
+                    <option value="gpa">
+                        GPA Distribution
+                    </option>
+
+                    <option value="research">
+                        Research Experience
+                    </option>
+
+                    <option value="scores">
+                        Evaluation Scores
+                    </option>
+
+                </select>
+
+            </div>
+
+            <canvas id="analyticsChart"></canvas>
+
+        </div>
+
+        <div class="stats-panel">
+
+            <div>
+
+                <h2>
+                    Statistics Summary
+                </h2>
+
+                <div class="stats-list">
+
+                    <div class="stats-row">
+
+                        <span>Total Candidates</span>
+
+                        <strong id="totalCandidates">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="stats-row">
+
+                        <span>Selected</span>
+
+                        <strong id="selectedCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="stats-row">
+
+                        <span>Rejected</span>
+
+                        <strong id="rejectedCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="stats-row">
+
+                        <span>Average Score</span>
+
+                        <strong id="averageScore">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="stats-row">
+
+                        <span>Average GPA</span>
+
+                        <strong id="averageGpa">
+                            0
+                        </strong>
+
+                    </div>
+
+                    <div class="stats-row">
+
+                        <span>Research Profiles</span>
+
+                        <strong id="researchCount">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="analytics-footer">
+
+        <div class="summary-box">
+
+            <h3>
+                Statistical Summary
+            </h3>
+
+            <p id="summaryText">
+                Loading analytics...
+            </p>
+
+        </div>
+
+        <div class="export-buttons">
+
+            <button id="downloadPdf">
+                Export PDF
+            </button>
+
+            <button id="downloadJson">
+                Export JSON
+            </button>
+
+            <button id="downloadCsv">
+                Export Excel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

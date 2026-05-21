@@ -32,67 +32,106 @@ def extract_marks(text):
     twelfth = None
     gpa = None
 
-    tenth_patterns = [
-    r"(10th|class x|secondary|ssc|cbse|icse).*?(\d{2,3}\.?\d?)\s?%",
-    r"(\d{2,3}\.?\d?)\s?%.*?(10th|class x|secondary)"
-]
+    lines = [
 
-    twelfth_patterns = [
-        r"(12th|class xii|senior secondary|hsc|isc|intermediate).*?(\d{2,3}\.?\d?)\s?%",
-        r"(\d{2,3}\.?\d?)\s?%.*?(12th|class xii|senior secondary)"
+        line.strip()
+
+        for line in text.split("\n")
+
+        if line.strip()
     ]
 
+    percentage_pattern = (
+        r"(\d{2,3}(?:\.\d{1,2})?)\s?%"
+    )
+
+    tenth_keywords = [
+        "10th",
+        "class x",
+        "secondary",
+        "ssc",
+        "matriculation"
+    ]
+
+    twelfth_keywords = [
+        "12th",
+        "class xii",
+        "senior secondary",
+        "hsc",
+        "isc",
+        "intermediate"
+    ]
+
+    for i, line in enumerate(lines):
+
+        current_window = " ".join(
+
+            lines[
+                max(0, i - 1):
+                min(len(lines), i + 3)
+            ]
+        )
+
+        if any(
+            keyword in current_window
+            for keyword in tenth_keywords
+        ):
+
+            percentages = re.findall(
+                percentage_pattern,
+                current_window
+            )
+
+            if percentages:
+
+                tenth = max(
+                    [
+                        float(p)
+                        for p in percentages
+                    ]
+                )
+
+        if any(
+            keyword in current_window
+            for keyword in twelfth_keywords
+        ):
+
+            percentages = re.findall(
+                percentage_pattern,
+                current_window
+            )
+
+            if percentages:
+
+                twelfth = max(
+                    [
+                        float(p)
+                        for p in percentages
+                    ]
+                )
+
     gpa_patterns = [
+
         r"(cgpa|gpa).*?(\d\.\d{1,2})",
+
         r"(\d\.\d{1,2}).*?(cgpa|gpa)"
     ]
 
-    for pattern in tenth_patterns:
-
-        match = re.search(pattern, text)
-
-        if match:
-
-            for group in match.groups():
-
-                try:
-                    tenth = float(group)
-                    break
-
-                except:
-                    continue
-
-        if tenth:
-            break
-
-    for pattern in twelfth_patterns:
-
-        match = re.search(pattern, text)
-
-        if match:
-
-            for group in match.groups():
-
-                try:
-                    twelfth = float(group)
-                    break
-
-                except:
-                    continue
-
-        if twelfth:
-            break
-
     for pattern in gpa_patterns:
 
-        match = re.search(pattern, text)
+        match = re.search(
+            pattern,
+            text
+        )
 
         if match:
 
             for group in match.groups():
 
                 try:
+
                     gpa = float(group)
+
                     break
 
                 except:
@@ -111,7 +150,8 @@ def extract_marks(text):
 def evaluate_candidate(
     text,
     marks,
-    skills
+    skills,
+    semantic_result
 ):
 
     text = text.lower()
@@ -167,7 +207,10 @@ def evaluate_candidate(
             requirements["research_weight"],
 
         "achievement":
-            requirements["achievement_weight"]
+            requirements["achievement_weight"],
+
+        "semantic":
+            20
     }
 
     score = 0
@@ -186,13 +229,15 @@ def evaluate_candidate(
             ]
         }
 
-    score += (
+    academic_score = (
         (gpa / 10)
         * weights["gpa"]
     )
 
+    score += academic_score
+
     reasons.append(
-        "Academic score matched"
+        f"Academic score contribution: {round(academic_score, 2)}"
     )
 
     for branch in disallowed_branches:
@@ -207,25 +252,29 @@ def evaluate_candidate(
                 ]
             }
 
-    matched_required = 0
+    matched_required = []
 
     for skill in required_skills:
 
         if skill in skills:
 
-            matched_required += 1
+            matched_required.append(
+                skill
+            )
 
-    matched_preferred = 0
+    matched_preferred = []
 
     for skill in preferred_skills:
 
         if skill in skills:
 
-            matched_preferred += 1
+            matched_preferred.append(
+                skill
+            )
 
     total_skill_score = (
-        matched_required * 8
-        + matched_preferred * 4
+        len(matched_required) * 8
+        + len(matched_preferred) * 4
     )
 
     total_skill_score = min(
@@ -238,8 +287,52 @@ def evaluate_candidate(
     if total_skill_score > 0:
 
         reasons.append(
-            "Skill match detected"
+            "Matched skills: "
+            + ", ".join(
+                matched_required
+                + matched_preferred
+            )
         )
+
+    semantic_similarity = semantic_result.get(
+        "average_similarity",
+        0
+    )
+
+    semantic_score = min(
+        semantic_similarity * 30,
+        weights["semantic"]
+    )
+
+    score += semantic_score
+
+    reasons.append(
+        f"Semantic score contribution: {round(semantic_score, 2)}"
+    )
+
+    if semantic_similarity > 0.3:
+
+        semantic_explanations = []
+
+        for item in semantic_result.get(
+            "top_chunks",
+            []
+        ):
+
+            semantic_explanations.append(
+
+                f"{item['section']} "
+                f"(similarity: {item['similarity']})"
+            )
+
+        if semantic_explanations:
+
+            reasons.append(
+                "Top semantic matches: "
+                + "; ".join(
+                    semantic_explanations
+                )
+            )
 
     research_keywords = [
         "research",
@@ -248,17 +341,26 @@ def evaluate_candidate(
         "journal"
     ]
 
+    matched_research = set()
+
     for keyword in research_keywords:
 
         if keyword in text:
 
-            score += weights["research"]
-
-            reasons.append(
-                "Research experience detected"
+            matched_research.add(
+                keyword
             )
 
-            break
+    if matched_research:
+
+        score += weights["research"]
+
+        reasons.append(
+            "Research keywords detected: "
+            + ", ".join(
+                matched_research
+            )
+        )
 
     achievement_keywords = [
         "winner",
@@ -267,20 +369,32 @@ def evaluate_candidate(
         "hackathon"
     ]
 
+    matched_achievements = set()
+
     for keyword in achievement_keywords:
 
         if keyword in text:
 
-            score += weights["achievement"]
-
-            reasons.append(
-                "Achievements detected"
+            matched_achievements.add(
+                keyword
             )
 
-            break
+    if matched_achievements:
+
+        score += weights["achievement"]
+
+        reasons.append(
+            "Achievements detected: "
+            + ", ".join(
+                matched_achievements
+            )
+        )
 
     return {
         "selected": True,
-        "score": round(score, 2),
+        "score": min(
+            round(float(score), 2),
+            100
+        ),
         "reasons": reasons
     }

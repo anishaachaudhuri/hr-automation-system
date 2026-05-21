@@ -1,51 +1,120 @@
-async function loadPage(pageName) {
+async function loadPage(page) {
 
-    const content =
-        document.getElementById("content");
-
-    const response = await fetch(
-        `/static/pages/${pageName}.html`
-    );
-
-    const html = await response.text();
-
-    content.innerHTML = html;
-
-    const oldStyles =
-        document.querySelectorAll(
-            ".dynamic-style"
+    const contentArea =
+        document.getElementById(
+            "content-area"
         );
 
-    oldStyles.forEach(style => style.remove());
+    if (!contentArea) {
+        return;
+    }
 
-    const style =
-        document.createElement("link");
+    try {
 
-    style.rel = "stylesheet";
+        const response =
+            await fetch(
+                `/static/pages/${page}.html`
+            );
 
-    style.href = `/static/css/${pageName}.css`;
+        const html =
+            await response.text();
 
-    style.className = "dynamic-style";
+        contentArea.innerHTML =
+            html;
 
-    document.head.appendChild(style);
+        removeOldScripts();
 
-    const oldScript =
-        document.getElementById("dynamic-script");
+        loadPageScript(page);
 
-    if (oldScript) {
-        oldScript.remove();
+    } catch (error) {
+
+        console.error(
+            "Page Load Error:",
+            error
+        );
+    }
+}
+
+function removeOldScripts() {
+
+    const oldScripts =
+        document.querySelectorAll(
+            ".dynamic-script"
+        );
+
+    oldScripts.forEach(script => {
+
+        script.remove();
+    });
+}
+
+function loadPageScript(page) {
+
+    let scriptPath = "";
+
+    if (page === "analytics") {
+
+        scriptPath =
+            "/static/js/analytics.js";
+    }
+
+    else if (page === "upload") {
+
+        scriptPath =
+            "/static/js/upload.js";
+    }
+
+    else if (page === "results") {
+
+        scriptPath =
+            "/static/js/results.js";
+    }
+
+    else if (
+        page === "requirements-login"
+    ) {
+
+        scriptPath =
+            "/static/js/requirements.js";
+    }
+
+    else if (
+        page === "requirements-dashboard"
+    ) {
+
+        scriptPath =
+            "/static/js/requirements.js";
+    }
+
+    else if (page === "allocation") {
+
+        scriptPath =
+            "/static/js/allocation.js";
+    }
+
+    if (scriptPath === "") {
+        return;
     }
 
     const script =
-        document.createElement("script");
+        document.createElement(
+            "script"
+        );
 
-    script.src = `/static/js/${pageName}.js`;
+    script.className =
+        "dynamic-script";
 
-    script.id = "dynamic-script";
+    script.src =
+        scriptPath +
+        "?v=" +
+        Date.now();
 
-    document.body.appendChild(script);
+    document.body.appendChild(
+        script
+    );
 }
 
 window.onload = function () {
-    loadPage("upload");
+
+    loadPage("analytics");
 };

@@ -6,67 +6,74 @@
 
 body{
     font-family:Arial,sans-serif;
-    background:#f4f7fb;
+    background:#f4f8ff;
     color:#0f172a;
 }
 
-.dashboard{
+.layout{
     display:flex;
     min-height:100vh;
 }
 
 .sidebar{
-    width:280px;
+    width:290px;
     background:white;
     border-right:1px solid #dbeafe;
-    padding:30px 20px;
-    display:flex;
-    flex-direction:column;
+    padding:32px 22px;
 }
 
-.sidebar-top{
+.sidebar-header{
     text-align:center;
-    margin-bottom:40px;
+    margin-bottom:45px;
 }
 
-.sidebar-top img{
-    width:90px;
-    margin-bottom:15px;
+.sidebar-header img{
+    width:100px;
+    height:100px;
+    object-fit:contain;
+    margin-bottom:18px;
 }
 
-.sidebar-top h2{
+.sidebar-header h1{
     color:#18489c;
+    font-size:30px;
     margin-bottom:8px;
 }
 
-.sidebar-top p{
+.sidebar-header p{
     color:#64748b;
-    font-size:14px;
 }
 
-nav{
+.sidebar-nav{
     display:flex;
     flex-direction:column;
-    gap:14px;
+    gap:16px;
 }
 
-nav button{
-    padding:15px;
+.sidebar-nav button{
     border:none;
-    border-radius:14px;
+    background:#eff6ff;
+    color:#18489c;
+    padding:18px;
+    border-radius:18px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.sidebar-nav button:hover{
+    background:#2563eb;
+    color:white;
+}
+
+.sidebar-nav button.active{
     background:#18489c;
     color:white;
-    font-size:15px;
-    cursor:pointer;
-    transition:0.3s;
 }
 
-nav button:hover{
-    background:#113574;
-}
-
-#content{
+.main-content{
     flex:1;
     padding:40px;
-    overflow:auto;
+    overflow-y:auto;
 }

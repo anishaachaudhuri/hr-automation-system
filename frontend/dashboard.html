@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <meta charset="UTF-8">
@@ -10,7 +11,7 @@
     >
 
     <title>
-        HR Automation Dashboard
+        HR Automation System
     </title>
 
     <link
@@ -18,45 +19,97 @@
         href="/static/css/dashboard.css"
     >
 
+    <link
+        rel="stylesheet"
+        href="/static/css/analytics.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/upload.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/results.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/requirements-dashboard.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/requirements-login.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="/static/css/allocation.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
+
 <body>
 
-    <div class="dashboard">
+    <div class="layout">
 
         <aside class="sidebar">
 
-            <div class="sidebar-top">
+            <div class="sidebar-header">
 
                 <img
                     src="/static/assets/DRDO-logo.png"
-                    alt="Logo"
+                    alt="DRDO Logo"
                 >
 
-                <h2>
-                    HR Automation
-                </h2>
+                <h1>
+                    HR Automation System
+                </h1>
 
                 <p>
-                    Candidate Management System
+                    Candidate Management Platform
                 </p>
 
             </div>
 
-            <nav>
+            <nav class="sidebar-nav">
 
-                <button onclick="loadPage('upload')">
+                <button
+                    data-page="analytics"
+                    onclick="loadPage('analytics')"
+                >
+                    Dashboard
+                </button>
+
+                <button
+                    data-page="upload"
+                    onclick="loadPage('upload')"
+                >
                     Upload Resume
                 </button>
 
-                <button onclick="loadPage('results')">
+                <button
+                    data-page="results"
+                    onclick="loadPage('results')"
+                >
                     Candidate Results
                 </button>
 
-                <button onclick="loadPage('requirements')">
+                <button
+                    data-page="requirements-login"
+                    onclick="loadPage('requirements-login')"
+                >
                     Requirements
                 </button>
 
-                <button onclick="loadPage('allocation')">
+                <button
+                    data-page="allocation"
+                    onclick="loadPage('allocation')"
+                >
                     Allocation
                 </button>
 
@@ -64,11 +117,18 @@
 
         </aside>
 
-        <main id="content"></main>
+        <main class="main-content">
+
+            <div id="content-area">
+
+            </div>
+
+        </main>
 
     </div>
 
     <script src="/static/js/dashboard.js"></script>
 
 </body>
+
 </html>
