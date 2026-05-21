@@ -6,6 +6,89 @@ let sortDescending = true;
 
 let topK = 3;
 
+const scientists = [
+
+    {
+        name: "Dr. R. Srinivasan",
+        specialization: "artificial intelligence",
+        division: "AI & Intelligent Systems",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Ananya Mehta",
+        specialization: "cybersecurity",
+        division: "Cyber Defence Systems",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Vivek Sharma",
+        specialization: "machine learning",
+        division: "Machine Learning Research",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Priya Nair",
+        specialization: "computer vision",
+        division: "Vision & Image Processing",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Arvind Rao",
+        specialization: "data science",
+        division: "Data Analytics Division",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Sneha Kulkarni",
+        specialization: "nlp",
+        division: "Language Computing Systems",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Karan Malhotra",
+        specialization: "cloud computing",
+        division: "Distributed Computing Systems",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Neeraj Bhatia",
+        specialization: "embedded systems",
+        division: "Embedded & Real-Time Systems",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Ishita Verma",
+        specialization: "web development",
+        division: "Software Applications Group",
+        maxInterns: 10,
+        assigned: []
+    },
+
+    {
+        name: "Dr. Aditya Kapoor",
+        specialization: "network security",
+        division: "Secure Network Systems",
+        maxInterns: 10,
+        assigned: []
+    }
+];
+
 async function loadCandidates() {
 
     try {
@@ -122,6 +205,57 @@ function getFilteredCandidates() {
     return filtered;
 }
 
+function allocateScientists() {
+
+    scientists.forEach(scientist => {
+
+        scientist.assigned = [];
+    });
+
+    const selectedCandidates =
+        candidates.filter(c => c.selected);
+
+    selectedCandidates.forEach(candidate => {
+
+        const candidateSkills =
+            candidate.skills
+                .toLowerCase();
+
+        for (let scientist of scientists) {
+
+            const hasMatchingSkill =
+                candidateSkills.includes(
+                    scientist.specialization
+                );
+
+            const hasCapacity =
+                scientist.assigned.length
+                < scientist.maxInterns;
+
+            if (
+                hasMatchingSkill &&
+                hasCapacity
+            ) {
+
+                scientist.assigned.push(
+                    candidate.name
+                );
+
+candidate.allottedScientist =
+    scientist.name;
+
+candidate.allottedDivision =
+    scientist.division;
+
+candidate.allocationReason =
+    `Matched with ${scientist.specialization}`;
+
+                break;
+            }
+        }
+    });
+}
+
 function renderCandidates() {
 
     const container =
@@ -132,7 +266,7 @@ function renderCandidates() {
     if (!container) {
         return;
     }
-
+    allocateScientists();
     const filtered =
         getFilteredCandidates();
 
@@ -211,69 +345,90 @@ function renderCardView(
 
         card.innerHTML = `
 
-            <div class="candidate-top-ui">
+    <div class="candidate-top-ui">
 
-                <div>
+        <div>
 
-                    <h2>
-                        ${candidate.name || "Unknown"}
-                    </h2>
+            <h2>
+                ${candidate.name || "Unknown"}
+            </h2>
 
-                    <p>
-                        GPA:
-                        ${candidate.gpa || "N/A"}
-                    </p>
+            <p>
+                GPA:
+                ${candidate.gpa || "N/A"}
+            </p>
 
-                </div>
+        </div>
 
-                <div class="
-                    ${candidate.selected
-                        ? "selected-pill"
-                        : "rejected-pill"}
-                ">
+        <div class="
+            ${candidate.selected
+                ? "selected-pill"
+                : "rejected-pill"}
+        ">
 
-                    ${candidate.selected
-                        ? "SELECTED"
-                        : "REJECTED"}
+            ${candidate.selected
+                ? "SELECTED"
+                : "REJECTED"}
 
-                </div>
+        </div>
 
-            </div>
+    </div>
 
-            <div class="candidate-score-ui">
+    <div class="candidate-score-ui">
 
-                Score:
-                ${candidate.score}
+        Score:
+        ${candidate.score}
 
-            </div>
+    </div>
 
-            <div class="candidate-section-ui">
+    <div class="candidate-section-ui">
 
-                <h3>
-                    Skills
-                </h3>
+        <h3>
+            Allotted Scientist
+        </h3>
 
-                <div class="skills-wrapper">
-                    ${skills}
-                </div>
+<p>
+    ${candidate.allottedScientist || "Not Allocated"}
+</p>
 
-            </div>
+<p>
+    ${candidate.allottedDivision || ""}
+</p>
 
-            <div class="candidate-section-ui">
+<p>
+    ${candidate.allocationReason || ""}
+</p>
+    </div>
 
-                <h3>
-                    Evaluation Reasons
-                </h3>
+    <div class="candidate-section-ui">
 
-                <ul>
-                    ${reasons}
-                </ul>
+        <h3>
+            Skills
+        </h3>
 
-            </div>
-        `;
+        <div class="skills-wrapper">
+            ${skills}
+        </div>
 
-        grid.appendChild(card);
-    });
+    </div>
+
+    <div class="candidate-section-ui">
+
+        <h3>
+            Evaluation Reasons
+        </h3>
+
+        <ul>
+            ${reasons}
+        </ul>
+
+    </div>
+
+`;
+
+grid.appendChild(card);
+
+});
 }
 
 function renderTableView(
@@ -298,6 +453,8 @@ function renderTableView(
                         <th>Score</th>
 
                         <th>Status</th>
+
+                        <th>Scientist</th>
 
                         <th>Skills</th>
 
@@ -349,6 +506,10 @@ function renderTableView(
 
                     </span>
 
+                </td>
+
+                <td>
+                   ${candidate.allottedScientist || "N/A"}
                 </td>
 
                 <td>
