@@ -1,71 +1,35 @@
-import sqlite3
-import os
+from sqlalchemy.orm import Session
 
-
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
+from backend.db import (
+    SessionLocal,
+    engine
 )
 
-DB_NAME = os.path.join(
-    BASE_DIR,
-    "../data/hr_system.db"
+from backend.models import (
+    Base,
+    Candidate
+)
+
+Base.metadata.create_all(
+    bind=engine
 )
 
 
 def get_connection():
 
-    conn = sqlite3.connect(DB_NAME)
-
-    conn.row_factory = sqlite3.Row
-
-    return conn
+    return SessionLocal()
 
 
 def create_table():
 
-    conn = get_connection()
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS candidates (
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        name TEXT,
-
-        filename TEXT,
-
-        skills TEXT,
-
-        tenth REAL,
-
-        twelfth REAL,
-
-        gpa REAL,
-
-        selected BOOLEAN,
-
-        score REAL,
-
-        semantic_score REAL,
-
-        top_semantic_chunk TEXT,
-
-        reasons TEXT
+    Base.metadata.create_all(
+        bind=engine
     )
-    """)
-
-    conn.commit()
-
-    conn.close()
 
 
 def save_candidate(data):
 
-    conn = get_connection()
-
-    cursor = conn.cursor()
+    db: Session = SessionLocal()
 
     semantic_result = data.get(
         "semantic_matching",
@@ -91,77 +55,41 @@ def save_candidate(data):
             ""
         )
 
-    print("Saving candidate...")
-    print(data)
+    candidate = Candidate(
 
-    cursor.execute("""
-    INSERT INTO candidates (
-
-        name,
-
-        filename,
-
-        skills,
-
-        tenth,
-
-        twelfth,
-
-        gpa,
-
-        selected,
-
-        score,
-
-        semantic_score,
-
-        top_semantic_chunk,
-
-        reasons
-
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-
-        data.get(
+        name=data.get(
             "name",
             "Unknown"
         ),
 
-        data.get(
+        filename=data.get(
             "filename",
             ""
         ),
 
-        ", ".join(
+        skills=", ".join(
             data.get(
                 "skills",
                 []
             )
         ),
 
-        data.get(
+        tenth=data.get(
             "marks",
             {}
-        ).get(
-            "tenth"
-        ),
+        ).get("tenth"),
 
-        data.get(
+        twelfth=data.get(
             "marks",
             {}
-        ).get(
-            "twelfth"
-        ),
+        ).get("twelfth"),
 
-        data.get(
+        gpa=data.get(
             "marks",
             {}
-        ).get(
-            "gpa"
-        ),
+        ).get("gpa"),
 
-        data.get(
+        selected=data.get(
             "evaluation",
             {}
         ).get(
@@ -169,7 +97,7 @@ def save_candidate(data):
             False
         ),
 
-        data.get(
+        score=data.get(
             "evaluation",
             {}
         ).get(
@@ -177,11 +105,11 @@ def save_candidate(data):
             0
         ),
 
-        semantic_score,
+        semantic_score=semantic_score,
 
-        top_chunk,
+        top_semantic_chunk=top_chunk,
 
-        ", ".join(
+        reasons=", ".join(
             data.get(
                 "evaluation",
                 {}
@@ -190,12 +118,10 @@ def save_candidate(data):
                 []
             )
         )
-    ))
-
-    conn.commit()
-
-    print(
-        "Candidate inserted successfully"
     )
 
-    conn.close()
+    db.add(candidate)
+
+    db.commit()
+
+    db.close()

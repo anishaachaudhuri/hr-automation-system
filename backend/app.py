@@ -1,5 +1,5 @@
 from unittest import result
-
+from backend.models import Candidate
 from fastapi import (
     FastAPI,
     File,
@@ -8,7 +8,6 @@ from fastapi import (
     Request,
     HTTPException
 )
-
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi.staticfiles import StaticFiles
@@ -360,20 +359,17 @@ def demo_resume():
 
 @app.get("/candidates")
 def get_candidates():
-
     conn = get_connection()
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "SELECT * FROM candidates"
-    )
-
-    candidates = cursor.fetchall()
-
+    candidates = conn.query(
+        Candidate
+    ).all()
     conn.close()
-
     return [
-        dict(candidate)
+        {
+            key: value
+            for key, value
+            in candidate.__dict__.items()
+            if key != "_sa_instance_state"
+        }
         for candidate in candidates
     ]
