@@ -1,5 +1,8 @@
 from unittest import result
 from backend.models import Candidate
+from backend.serializers import (
+    candidate_to_dict
+)
 from fastapi import (
     FastAPI,
     File,
@@ -359,17 +362,24 @@ def demo_resume():
 
 @app.get("/candidates")
 def get_candidates():
+
     conn = get_connection()
+
     candidates = conn.query(
         Candidate
     ).all()
+
     conn.close()
+
     return [
-        {
-            key: value
-            for key, value
-            in candidate.__dict__.items()
-            if key != "_sa_instance_state"
-        }
-        for candidate in candidates
+        candidate_to_dict(c)
+        for c in candidates
     ]
+
+@app.get("/health")
+def health():
+
+    return {
+        "status": "healthy",
+        "database": "postgresql"
+    }

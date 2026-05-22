@@ -130,11 +130,18 @@ def get_requirements():
     db.close()
 
     return {
-        key: value
-        for key, value
-        in req.__dict__.items()
-        if key != "_sa_instance_state"
-    }
+    "id": req.id,
+    "semantic_profile": req.semantic_profile,
+    "minimum_gpa": req.minimum_gpa,
+    "required_skills": req.required_skills,
+    "preferred_skills": req.preferred_skills,
+    "disallowed_branches": req.disallowed_branches,
+    "skill_weight": req.skill_weight,
+    "gpa_weight": req.gpa_weight,
+    "research_weight": req.research_weight,
+    "achievement_weight": req.achievement_weight,
+    "updated_by": req.updated_by
+}
 
 
 def update_requirements(data, username):
