@@ -17,7 +17,9 @@ def extract_skills(text):
 
     for skill in SKILL_KEYWORDS:
 
-        if skill in text:
+        pattern = r"\b" + re.escape(skill.lower()) + r"\b"
+
+        if re.search(pattern, text):
 
             found_skills.append(skill)
 
@@ -151,11 +153,15 @@ def evaluate_candidate(
     text,
     marks,
     skills,
-    semantic_result
+    semantic_result,
+    sections
 ):
 
     text = text.lower()
-
+    education_text = sections.get(
+        "education",
+        ""
+    ).lower()
     requirements = get_requirements()
 
     minimum_gpa = (
@@ -242,7 +248,16 @@ def evaluate_candidate(
 
     for branch in disallowed_branches:
 
-        if branch in text:
+        pattern = (
+            r"\b"
+            + re.escape(branch.lower())
+            + r"\b"
+        )
+
+        if re.search(
+            pattern,
+            education_text
+        ):
 
             return {
                 "selected": False,
@@ -345,7 +360,16 @@ def evaluate_candidate(
 
     for keyword in research_keywords:
 
-        if keyword in text:
+        pattern = (
+            r"\b"
+            + re.escape(keyword)
+            + r"\b"
+        )
+
+        if re.search(
+            pattern,
+            text
+        ):
 
             matched_research.add(
                 keyword
@@ -373,7 +397,16 @@ def evaluate_candidate(
 
     for keyword in achievement_keywords:
 
-        if keyword in text:
+        pattern = (
+            r"\b"
+            + re.escape(keyword)
+            + r"\b"
+        )
+
+        if re.search(
+            pattern,
+            text
+        ):
 
             matched_achievements.add(
                 keyword

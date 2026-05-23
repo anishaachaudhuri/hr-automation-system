@@ -154,23 +154,50 @@ def update_requirements(data, username):
         Requirement.id == 1
     ).first()
 
-    req.semantic_profile = data["semantic_profile"]
+    req.semantic_profile = data.get(
+        "semantic_profile",
+        data.get("semanticProfile", "")
+    )
 
-    req.minimum_gpa = data["minimum_gpa"]
+    req.minimum_gpa = data.get(
+        "minimum_gpa",
+        data.get("minimumGpa", 0)
+    )
 
-    req.required_skills = data["required_skills"]
+    req.required_skills = data.get(
+        "required_skills",
+        data.get("requiredSkills", "")
+    )
 
-    req.preferred_skills = data["preferred_skills"]
+    req.preferred_skills = data.get(
+        "preferred_skills",
+        data.get("preferredSkills", "")
+    )
 
-    req.disallowed_branches = data["disallowed_branches"]
+    req.disallowed_branches = data.get(
+        "disallowed_branches",
+        data.get("disallowedBranches", "")
+    )
 
-    req.skill_weight = data["skill_weight"]
+    req.skill_weight = data.get(
+        "skill_weight",
+        data.get("skillWeight", 0)
+    )
 
-    req.gpa_weight = data["gpa_weight"]
+    req.gpa_weight = data.get(
+        "gpa_weight",
+        data.get("gpaWeight", 0)
+    )
 
-    req.research_weight = data["research_weight"]
+    req.research_weight = data.get(
+        "research_weight",
+        data.get("researchWeight", 0)
+    )
 
-    req.achievement_weight = data["achievement_weight"]
+    req.achievement_weight = data.get(
+        "achievement_weight",
+        data.get("achievementWeight", 0)
+    )
 
     req.updated_by = username
 

@@ -10,6 +10,10 @@ from backend.models import (
     Candidate
 )
 
+from backend.services.nlp_engine import (
+    embedding_model
+)
+
 Base.metadata.create_all(
     bind=engine
 )
@@ -54,6 +58,14 @@ def save_candidate(data):
             "text",
             ""
         )
+
+    embedding_text = " ".join(
+        data.get("skills", [])
+    )
+
+    embedding_vector = embedding_model.encode(
+        embedding_text
+    ).tolist()
 
     candidate = Candidate(
 
@@ -106,7 +118,7 @@ def save_candidate(data):
         ),
 
         semantic_score=semantic_score,
-
+        embedding=embedding_vector,
         top_semantic_chunk=top_chunk,
 
         reasons=", ".join(

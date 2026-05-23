@@ -1,3 +1,4 @@
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Column,
     Integer,
@@ -8,7 +9,6 @@ from sqlalchemy import (
 )
 
 from backend.db import Base
-
 
 class Candidate(Base):
 
@@ -37,6 +37,8 @@ class Candidate(Base):
     score = Column(Float)
 
     semantic_score = Column(Float)
+
+    embedding = Column(Vector(384))
 
     top_semantic_chunk = Column(Text)
 

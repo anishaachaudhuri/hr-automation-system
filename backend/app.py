@@ -3,6 +3,11 @@ from backend.models import Candidate
 from backend.serializers import (
     candidate_to_dict
 )
+from sqlalchemy import text
+
+from backend.services.nlp_engine import (
+    embedding_model
+)
 from fastapi import (
     FastAPI,
     File,
@@ -266,7 +271,8 @@ def upload_resume(
         extracted_text,
         marks,
         skills,
-        semantic_result
+        semantic_result,
+        sections
     )
 
     result = {
@@ -291,6 +297,44 @@ def upload_resume(
 
     return result
 
+@app.get("/semantic-search")
+def semantic_search(query: str):
+
+    conn = get_connection()
+
+    query_embedding = embedding_model.encode(
+        query
+    ).tolist()
+
+    sql = text("""
+    SELECT
+        id,
+        name,
+        skills,
+        score,
+        embedding <=> CAST(:embedding AS vector)
+        AS distance
+    FROM candidates
+    ORDER BY distance
+    LIMIT 5
+    """)
+
+    results = conn.execute(
+        sql,
+        {
+            "embedding":
+                str(query_embedding)
+        }
+    )
+
+    rows = results.fetchall()
+
+    conn.close()
+
+    return [
+        dict(row._mapping)
+        for row in rows
+    ]
 
 @app.get("/demo")
 def demo_resume():
@@ -338,7 +382,8 @@ def demo_resume():
         extracted_text,
         marks,
         skills,
-        semantic_result
+        semantic_result,
+        sections
     )
 
     result = {
