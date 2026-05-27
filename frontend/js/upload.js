@@ -49,9 +49,21 @@ uploadBtn.addEventListener(
 
         try {
 
+            let endpoint =
+                `${API_BASE}/upload`;
+
+            // ZIP upload
+            if (
+                file.name.endsWith(".zip")
+            ) {
+
+                endpoint =
+                    `${API_BASE}/upload-zip`;
+            }
+
             const response =
                 await fetch(
-                    `${API_BASE}/upload`,
+                    endpoint,
                     {
                         method: "POST",
                         body: formData
@@ -60,6 +72,35 @@ uploadBtn.addEventListener(
 
             const data =
                 await response.json();
+
+            // ZIP RESPONSE
+            if (
+                file.name.endsWith(".zip")
+            ) {
+
+                status.innerHTML =
+                    "Bulk upload completed";
+
+                resultBox.innerHTML = `
+
+                    <div class="candidate-card">
+
+                        <h2>
+                            Bulk Upload Successful
+                        </h2>
+
+                        <p>
+                            Total Resumes Processed:
+                            ${data.total_processed}
+                        </p>
+
+                    </div>
+                `;
+
+                return;
+            }
+
+            // SINGLE PDF RESPONSE
 
             status.innerHTML =
                 "Resume processed successfully";

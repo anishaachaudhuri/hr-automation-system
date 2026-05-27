@@ -23,7 +23,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from starlette.middleware.sessions import SessionMiddleware
-
+import zipfile
+import tempfile
 import shutil
 import os
 import fitz
@@ -427,4 +428,138 @@ def health():
     return {
         "status": "healthy",
         "database": "postgresql"
+    }
+@app.post("/upload-zip")
+async def upload_zip(
+    file: UploadFile = File(...)
+):
+
+    if not file.filename.endswith(".zip"):
+
+        raise HTTPException(
+            status_code=400,
+            detail="Please upload a ZIP file"
+        )
+
+    processed_candidates = []
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+
+        zip_path = os.path.join(
+            temp_dir,
+            file.filename
+        )
+
+        # save uploaded zip
+        with open(zip_path, "wb") as buffer:
+
+            buffer.write(
+                await file.read()
+            )
+
+        # extract zip
+        with zipfile.ZipFile(
+            zip_path,
+            "r"
+        ) as zip_ref:
+
+            zip_ref.extractall(temp_dir)
+
+        # process resumes
+        for filename in os.listdir(temp_dir):
+
+            if not filename.endswith(".pdf"):
+                continue
+
+            file_path = os.path.join(
+                temp_dir,
+                filename
+            )
+
+            try:
+
+                extracted_text = (
+                    extract_text_from_pdf(
+                        file_path
+                    )
+                )
+
+                candidate_name = (
+                    extract_candidate_name(
+                        extracted_text
+                    )
+                )
+
+                skills = extract_skills(
+                    extracted_text
+                )
+
+                marks = extract_marks(
+                    extracted_text
+                )
+
+                requirements = (
+                    get_requirements()
+                )
+
+                semantic_profile = (
+                    requirements.get(
+                        "semantic_profile",
+                        ""
+                    )
+                )
+
+                sections = (
+                    extract_resume_sections(
+                        extracted_text
+                    )
+                )
+
+                semantic_result = (
+                    semantic_project_match(
+                        sections,
+                        semantic_profile
+                    )
+                )
+
+                evaluation = (
+                    evaluate_candidate(
+                        extracted_text,
+                        marks,
+                        skills,
+                        semantic_result,
+                        sections
+                    )
+                )
+
+                result = {
+                    "name": candidate_name,
+                    "filename": filename,
+                    "skills": skills,
+                    "marks": marks,
+                    "semantic_matching":
+                        semantic_result,
+                    "evaluation":
+                        evaluation
+                }
+
+                save_candidate(result)
+
+                processed_candidates.append(
+                    result
+                )
+
+            except Exception as e:
+
+                processed_candidates.append({
+                    "filename": filename,
+                    "error": str(e)
+                })
+
+    return {
+        "total_processed":
+            len(processed_candidates),
+
+        "candidates":
+            processed_candidates
     }
