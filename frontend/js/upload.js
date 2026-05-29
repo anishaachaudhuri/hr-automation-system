@@ -70,6 +70,18 @@ uploadBtn.addEventListener(
                     }
                 );
 
+            if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                console.error(errorText);
+
+                throw new Error(
+                    "Upload failed"
+                );
+            }
+
             const data =
                 await response.json();
 

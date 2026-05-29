@@ -450,14 +450,12 @@ async def upload_zip(
             file.filename
         )
 
-        # save uploaded zip
         with open(zip_path, "wb") as buffer:
 
             buffer.write(
                 await file.read()
             )
 
-        # extract zip
         with zipfile.ZipFile(
             zip_path,
             "r"
@@ -465,96 +463,109 @@ async def upload_zip(
 
             zip_ref.extractall(temp_dir)
 
-        # process resumes
-        for filename in os.listdir(temp_dir):
+        for root, dirs, files in os.walk(temp_dir):
 
-            if not filename.endswith(".pdf"):
-                continue
+            for filename in files:
 
-            file_path = os.path.join(
-                temp_dir,
-                filename
-            )
+                if not filename.lower().endswith(".pdf"):
+                    continue
 
-            try:
-
-                extracted_text = (
-                    extract_text_from_pdf(
-                        file_path
-                    )
+                file_path = os.path.join(
+                    root,
+                    filename
                 )
 
-                candidate_name = (
-                    extract_candidate_name(
+                print(
+                    "PROCESSING:",
+                    file_path
+                )
+
+                try:
+
+                    extracted_text = (
+                        extract_text_from_pdf(
+                            file_path
+                        )
+                    )
+
+                    candidate_name = (
+                        extract_candidate_name(
+                            extracted_text
+                        )
+                    )
+
+                    skills = extract_skills(
                         extracted_text
                     )
-                )
 
-                skills = extract_skills(
-                    extracted_text
-                )
-
-                marks = extract_marks(
-                    extracted_text
-                )
-
-                requirements = (
-                    get_requirements()
-                )
-
-                semantic_profile = (
-                    requirements.get(
-                        "semantic_profile",
-                        ""
-                    )
-                )
-
-                sections = (
-                    extract_resume_sections(
+                    marks = extract_marks(
                         extracted_text
                     )
-                )
 
-                semantic_result = (
-                    semantic_project_match(
-                        sections,
-                        semantic_profile
+                    requirements = (
+                        get_requirements()
                     )
-                )
 
-                evaluation = (
-                    evaluate_candidate(
-                        extracted_text,
-                        marks,
-                        skills,
-                        semantic_result,
-                        sections
+                    semantic_profile = (
+                        requirements.get(
+                            "semantic_profile",
+                            ""
+                        )
                     )
-                )
 
-                result = {
-                    "name": candidate_name,
-                    "filename": filename,
-                    "skills": skills,
-                    "marks": marks,
-                    "semantic_matching":
-                        semantic_result,
-                    "evaluation":
-                        evaluation
-                }
+                    sections = (
+                        extract_resume_sections(
+                            extracted_text
+                        )
+                    )
 
-                save_candidate(result)
+                    semantic_result = (
+                        semantic_project_match(
+                            sections,
+                            semantic_profile
+                        )
+                    )
 
-                processed_candidates.append(
-                    result
-                )
+                    evaluation = (
+                        evaluate_candidate(
+                            extracted_text,
+                            marks,
+                            skills,
+                            semantic_result,
+                            sections
+                        )
+                    )
 
-            except Exception as e:
+                    result = {
+                        "name": candidate_name,
+                        "filename": filename,
+                        "skills": skills,
+                        "marks": marks,
+                        "semantic_matching":
+                            semantic_result,
+                        "evaluation":
+                            evaluation
+                    }
 
-                processed_candidates.append({
-                    "filename": filename,
-                    "error": str(e)
-                })
+                    save_candidate(result)
+
+                    processed_candidates.append(
+                        result
+                    )
+
+                except Exception as e:
+
+                    print(
+                        "ERROR PROCESSING:",
+                        filename
+                    )
+
+                    print(str(e))
+
+                    processed_candidates.append({
+                        "filename": filename,
+                        "error": str(e)
+                    })
 
     return {
         "total_processed":
