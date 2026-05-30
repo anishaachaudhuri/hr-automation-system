@@ -493,12 +493,7 @@ function attachAnalyticsEvents() {
     if (pdfBtn) {
 
         pdfBtn.onclick =
-            function () {
-
-                alert(
-                    "PDF export coming soon"
-                );
-            };
+            downloadPDF;
     }
 }
 
@@ -563,5 +558,139 @@ function downloadCSV() {
 
     link.click();
 }
+async function downloadPDF() {
 
+    try {
+
+        const {
+            jsPDF
+        } = window.jspdf;
+
+        const pdf =
+            new jsPDF(
+                "p",
+                "mm",
+                "a4"
+            );
+
+        const chartTypes = [
+
+            {
+                value: "selection",
+                title:
+                    "Selection Distribution"
+            },
+
+            {
+                value: "skills",
+                title:
+                    "Top Skills Analysis"
+            },
+
+            {
+                value: "gpa",
+                title:
+                    "GPA Distribution"
+            },
+
+            {
+                value: "research",
+                title:
+                    "Research Experience"
+            },
+
+            {
+                value: "scores",
+                title:
+                    "Evaluation Scores"
+            }
+        ];
+
+        const selector =
+            document.getElementById(
+                "analyticsType"
+            );
+
+        for (
+            let i = 0;
+            i < chartTypes.length;
+            i++
+        ) {
+
+            selector.value =
+                chartTypes[i].value;
+
+            renderAnalyticsChart();
+
+            await new Promise(
+                resolve =>
+                    setTimeout(
+                        resolve,
+                        800
+                    )
+            );
+
+            const chartCard =
+                document.querySelector(
+                    ".chart-card"
+                );
+
+            const canvas =
+                await html2canvas(
+                    chartCard,
+                    {
+                        scale: 2
+                    }
+                );
+
+            const imageData =
+                canvas.toDataURL(
+                    "image/png"
+                );
+
+            if (i > 0) {
+
+                pdf.addPage();
+            }
+
+            pdf.setFontSize(20);
+
+            pdf.text(
+                chartTypes[i].title,
+                15,
+                20
+            );
+
+            const pdfWidth =
+                180;
+
+            const pdfHeight =
+                (
+                    canvas.height
+                    * pdfWidth
+                ) / canvas.width;
+
+            pdf.addImage(
+                imageData,
+                "PNG",
+                15,
+                30,
+                pdfWidth,
+                pdfHeight
+            );
+        }
+
+        pdf.save(
+            "complete-analytics-report.pdf"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "PDF export failed"
+        );
+    }
+}
 loadAnalytics();
