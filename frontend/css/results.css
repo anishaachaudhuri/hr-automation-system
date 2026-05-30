@@ -215,3 +215,29 @@
     border-radius:12px;
     border:1px solid #cbd5e1;
 }
+
+.candidate-actions{
+    margin-top:20px;
+}
+
+.delete-btn{
+
+    background:#dc2626;
+    color:white;
+
+    border:none;
+
+    padding:12px 18px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+.delete-btn:hover{
+    background:#b91c1c;
+}

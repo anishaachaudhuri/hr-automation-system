@@ -89,6 +89,47 @@ const scientists = [
     }
 ];
 
+async function deleteCandidate(
+    candidateId
+) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this candidate?\n\nThis action will permanently remove the candidate record, evaluation score, semantic analysis, and allocation details from the database."
+        );
+
+    if (!confirmed) {
+
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                `/candidate/${candidateId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+        const data =
+            await response.json();
+
+        alert(data.message);
+
+        await loadCandidates();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to delete candidate"
+        );
+    }
+}
+
 async function loadCandidates() {
 
     try {
@@ -381,6 +422,17 @@ function renderCardView(
 
     </div>
 
+    <div class="candidate-actions">
+
+        <button
+            class="delete-btn"
+            onclick="deleteCandidate(${candidate.id})"
+        >
+            Delete Candidate
+        </button>
+
+    </div>
+
     <div class="candidate-section-ui">
 
         <h3>
@@ -460,6 +512,8 @@ function renderTableView(
 
                         <th>Reasons</th>
 
+                        <th>Actions</th>
+
                     </tr>
 
                 </thead>
@@ -518,6 +572,17 @@ function renderTableView(
 
                 <td>
                     ${candidate.reasons || ""}
+                </td>
+
+                <td>
+
+                    <button
+                        class="delete-btn"
+                        onclick="deleteCandidate(${candidate.id})"
+                    >
+                        Delete
+                    </button>
+
                 </td>
 
             </tr>

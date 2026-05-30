@@ -422,6 +422,37 @@ def get_candidates():
         for c in candidates
     ]
 
+@app.delete("/candidate/{candidate_id}")
+def delete_candidate(candidate_id: int):
+
+    db = get_connection()
+
+    candidate = db.query(
+        Candidate
+    ).filter(
+        Candidate.id == candidate_id
+    ).first()
+
+    if not candidate:
+
+        db.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Candidate not found"
+        )
+
+    db.delete(candidate)
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "message":
+            "Candidate deleted successfully"
+    }
+
 @app.get("/health")
 def health():
 
