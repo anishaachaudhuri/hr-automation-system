@@ -5,9 +5,10 @@ from sqlalchemy import (
     String,
     Float,
     Boolean,
-    Text
+    Text,
+    DateTime
 )
-
+from sqlalchemy.sql import func
 from backend.db import Base
 
 class Candidate(Base):
@@ -91,3 +92,35 @@ class Requirement(Base):
     achievement_weight = Column(Float)
 
     updated_by = Column(String)
+
+class AuditLog(Base):
+
+    __tablename__ = "audit_logs"
+
+    id = Column(
+
+        Integer,
+
+        primary_key=True,
+
+        index=True
+
+    )
+
+    action_type = Column(String)
+
+    changed_field = Column(String)
+
+    old_value = Column(Text)
+
+    new_value = Column(Text)
+
+    description = Column(Text)
+
+    timestamp = Column(
+
+        DateTime(timezone=True),
+
+        server_default=func.now()
+
+    )

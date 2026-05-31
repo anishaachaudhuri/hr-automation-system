@@ -1,0 +1,63 @@
+<div class="audit-page">
+
+    <div class="audit-header">
+
+        <div>
+
+            <h1>
+                Audit Logs
+            </h1>
+
+            <p>
+                Recruitment activity tracking
+            </p>
+
+        </div>
+
+        <div class="audit-controls">
+
+            <select id="auditFilter">
+
+                <option value="ALL">
+                    All Actions
+                </option>
+
+                <option value="AUTH">
+                    Authentication
+                </option>
+
+                <option value="REQUIREMENT_CHANGE">
+                    Requirement Changes
+                </option>
+
+                <option value="CANDIDATE_UPLOAD">
+                    Candidate Uploads
+                </option>
+
+                <option value="CANDIDATE_DELETE">
+                    Candidate Deletes
+                </option>
+
+            </select>
+
+            <button id="exportAuditCsv">
+                Export CSV
+            </button>
+
+            <button id="exportAuditPdf">
+                Export PDF
+            </button>
+
+            <button id="deleteAuditsBtn">
+                Clear Logs
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="auditContainer">
+
+    </div>
+
+</div>

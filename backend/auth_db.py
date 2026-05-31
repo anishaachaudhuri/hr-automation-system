@@ -1,5 +1,7 @@
 from passlib.context import CryptContext
 
+from backend.audit import create_audit_log
+
 from backend.db import (
     SessionLocal,
     engine
@@ -65,12 +67,43 @@ def verify_admin(username, password):
     db.close()
 
     if not admin:
+
+        create_audit_log(
+
+            action_type="AUTH",
+
+            description=
+                "Failed login attempt"
+        )
+
         return False
 
-    return pwd_context.verify(
+    valid = pwd_context.verify(
         password,
         admin.hashed_password
     )
+
+    if valid:
+
+        create_audit_log(
+
+            action_type="AUTH",
+
+            description=
+                "Successful admin login"
+        )
+
+    else:
+
+        create_audit_log(
+
+            action_type="AUTH",
+
+            description=
+                "Failed login attempt"
+        )
+
+    return valid
 
 
 def create_default_requirements():
@@ -89,15 +122,23 @@ def create_default_requirements():
 
             id=1,
 
-            semantic_profile="Looking for candidates with experience in machine learning, backend systems, APIs, research, scalable systems and intelligent applications.",
+            semantic_profile=
+                "Looking for candidates with "
+                "experience in machine learning, "
+                "backend systems, APIs, research, "
+                "scalable systems and intelligent "
+                "applications.",
 
             minimum_gpa=8.0,
 
-            required_skills="python,machine learning",
+            required_skills=
+                "python,machine learning",
 
-            preferred_skills="nlp,opencv",
+            preferred_skills=
+                "nlp,opencv",
 
-            disallowed_branches="biotechnology",
+            disallowed_branches=
+                "biotechnology",
 
             skill_weight=40,
 
@@ -130,18 +171,39 @@ def get_requirements():
     db.close()
 
     return {
-    "id": req.id,
-    "semantic_profile": req.semantic_profile,
-    "minimum_gpa": req.minimum_gpa,
-    "required_skills": req.required_skills,
-    "preferred_skills": req.preferred_skills,
-    "disallowed_branches": req.disallowed_branches,
-    "skill_weight": req.skill_weight,
-    "gpa_weight": req.gpa_weight,
-    "research_weight": req.research_weight,
-    "achievement_weight": req.achievement_weight,
-    "updated_by": req.updated_by
-}
+
+        "id": req.id,
+
+        "semantic_profile":
+            req.semantic_profile,
+
+        "minimum_gpa":
+            req.minimum_gpa,
+
+        "required_skills":
+            req.required_skills,
+
+        "preferred_skills":
+            req.preferred_skills,
+
+        "disallowed_branches":
+            req.disallowed_branches,
+
+        "skill_weight":
+            req.skill_weight,
+
+        "gpa_weight":
+            req.gpa_weight,
+
+        "research_weight":
+            req.research_weight,
+
+        "achievement_weight":
+            req.achievement_weight,
+
+        "updated_by":
+            req.updated_by
+    }
 
 
 def update_requirements(data, username):
@@ -154,49 +216,263 @@ def update_requirements(data, username):
         Requirement.id == 1
     ).first()
 
-    req.semantic_profile = data.get(
+    new_semantic_profile = data.get(
         "semantic_profile",
         data.get("semanticProfile", "")
     )
 
-    req.minimum_gpa = data.get(
+    new_minimum_gpa = data.get(
         "minimum_gpa",
         data.get("minimumGpa", 0)
     )
 
-    req.required_skills = data.get(
+    new_required_skills = data.get(
         "required_skills",
         data.get("requiredSkills", "")
     )
 
-    req.preferred_skills = data.get(
+    new_preferred_skills = data.get(
         "preferred_skills",
         data.get("preferredSkills", "")
     )
 
-    req.disallowed_branches = data.get(
+    new_disallowed_branches = data.get(
         "disallowed_branches",
         data.get("disallowedBranches", "")
     )
 
-    req.skill_weight = data.get(
+    new_skill_weight = data.get(
         "skill_weight",
         data.get("skillWeight", 0)
     )
 
-    req.gpa_weight = data.get(
+    new_gpa_weight = data.get(
         "gpa_weight",
         data.get("gpaWeight", 0)
     )
 
-    req.research_weight = data.get(
+    new_research_weight = data.get(
         "research_weight",
         data.get("researchWeight", 0)
     )
 
-    req.achievement_weight = data.get(
+    new_achievement_weight = data.get(
         "achievement_weight",
         data.get("achievementWeight", 0)
+    )
+
+    # -------------------------
+    # AUDIT LOGGING
+    # -------------------------
+
+    if req.minimum_gpa != new_minimum_gpa:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "minimum_gpa",
+
+            old_value=
+                req.minimum_gpa,
+
+            new_value=
+                new_minimum_gpa,
+
+            description=
+                f"Minimum GPA changed "
+                f"from {req.minimum_gpa} "
+                f"to {new_minimum_gpa}"
+        )
+
+    if req.required_skills != new_required_skills:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "required_skills",
+
+            old_value=
+                req.required_skills,
+
+            new_value=
+                new_required_skills,
+
+            description=
+                "Required skills updated"
+        )
+
+    if req.preferred_skills != new_preferred_skills:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "preferred_skills",
+
+            old_value=
+                req.preferred_skills,
+
+            new_value=
+                new_preferred_skills,
+
+            description=
+                "Preferred skills updated"
+        )
+
+    if req.disallowed_branches != new_disallowed_branches:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "disallowed_branches",
+
+            old_value=
+                req.disallowed_branches,
+
+            new_value=
+                new_disallowed_branches,
+
+            description=
+                "Disallowed branches updated"
+        )
+
+    if req.skill_weight != new_skill_weight:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "skill_weight",
+
+            old_value=
+                req.skill_weight,
+
+            new_value=
+                new_skill_weight,
+
+            description=
+                f"Skill weight changed "
+                f"from {req.skill_weight} "
+                f"to {new_skill_weight}"
+        )
+
+    if req.gpa_weight != new_gpa_weight:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "gpa_weight",
+
+            old_value=
+                req.gpa_weight,
+
+            new_value=
+                new_gpa_weight,
+
+            description=
+                f"GPA weight changed "
+                f"from {req.gpa_weight} "
+                f"to {new_gpa_weight}"
+        )
+
+    if req.research_weight != new_research_weight:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "research_weight",
+
+            old_value=
+                req.research_weight,
+
+            new_value=
+                new_research_weight,
+
+            description=
+                f"Research weight changed "
+                f"from {req.research_weight} "
+                f"to {new_research_weight}"
+        )
+
+    if req.achievement_weight != new_achievement_weight:
+
+        create_audit_log(
+
+            action_type=
+                "REQUIREMENT_CHANGE",
+
+            changed_field=
+                "achievement_weight",
+
+            old_value=
+                req.achievement_weight,
+
+            new_value=
+                new_achievement_weight,
+
+            description=
+                f"Achievement weight changed "
+                f"from {req.achievement_weight} "
+                f"to {new_achievement_weight}"
+        )
+
+    # -------------------------
+    # UPDATE VALUES
+    # -------------------------
+
+    req.semantic_profile = (
+        new_semantic_profile
+    )
+
+    req.minimum_gpa = (
+        new_minimum_gpa
+    )
+
+    req.required_skills = (
+        new_required_skills
+    )
+
+    req.preferred_skills = (
+        new_preferred_skills
+    )
+
+    req.disallowed_branches = (
+        new_disallowed_branches
+    )
+
+    req.skill_weight = (
+        new_skill_weight
+    )
+
+    req.gpa_weight = (
+        new_gpa_weight
+    )
+
+    req.research_weight = (
+        new_research_weight
+    )
+
+    req.achievement_weight = (
+        new_achievement_weight
     )
 
     req.updated_by = username

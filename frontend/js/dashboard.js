@@ -92,6 +92,12 @@ function loadPageScript(page) {
             "/static/js/allocation.js";
     }
 
+    else if (page === "audit") {
+
+        scriptPath =
+            "/static/js/audit.js";
+    }
+
     if (scriptPath === "") {
         return;
     }

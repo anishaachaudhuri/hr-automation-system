@@ -1,5 +1,7 @@
 from unittest import result
 from backend.models import Candidate
+from backend.audit import create_audit_log
+from backend.models import AuditLog
 from backend.serializers import (
     candidate_to_dict
 )
@@ -122,14 +124,26 @@ def login(
     )
 
     if not valid:
+        create_audit_log(
 
+            action_type="AUTH",
+
+            description=
+                "Failed login attempt"
+        )
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
         )
 
     request.session["admin"] = username
+    create_audit_log(
 
+        action_type="AUTH",
+
+        description=
+            "Successful admin login"
+    )
     return {
         "success": True,
         "username": username
@@ -140,7 +154,13 @@ def login(
 def logout(request: Request):
 
     request.session.clear()
+    create_audit_log(
 
+        action_type="AUTH",
+
+        description=
+            "Successful logout"
+    )
     return {
         "message": "Logged out"
     }
@@ -296,6 +316,15 @@ def upload_resume(
 
     save_candidate(result)
 
+    create_audit_log(
+
+        action_type="CANDIDATE_UPLOAD",
+
+        description=
+            f"Candidate uploaded: "
+            f"{candidate_name}"
+    )
+
     return result
 
 @app.get("/semantic-search")
@@ -441,7 +470,14 @@ def delete_candidate(candidate_id: int):
             status_code=404,
             detail="Candidate not found"
         )
+    create_audit_log(
 
+        action_type="CANDIDATE_DELETE",
+
+        description=
+            f"Candidate deleted: "
+            f"{candidate.name}"
+    )
     db.delete(candidate)
 
     db.commit()
@@ -604,4 +640,49 @@ async def upload_zip(
 
         "candidates":
             processed_candidates
+    }
+@app.get("/audit-logs")
+def get_audit_logs():
+
+    db = get_connection()
+
+    logs = db.query(
+        AuditLog
+    ).order_by(
+        AuditLog.timestamp.desc()
+    ).all()
+
+    db.close()
+
+    return [
+
+        {
+            "id": log.id,
+            "action_type": log.action_type,
+            "changed_field": log.changed_field,
+            "old_value": log.old_value,
+            "new_value": log.new_value,
+            "description": log.description,
+            "timestamp": log.timestamp
+        }
+
+        for log in logs
+    ]
+
+@app.delete("/audit-logs")
+def clear_audit_logs():
+
+    db = get_connection()
+
+    db.query(
+        AuditLog
+    ).delete()
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "message":
+            "Audit logs deleted"
     }
