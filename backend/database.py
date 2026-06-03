@@ -129,7 +129,15 @@ def save_candidate(data):
                 "reasons",
                 []
             )
-        )
+        ),
+
+        allotted_scientist=None,
+
+        allotted_division=None,
+
+        allocation_reason=None,
+
+        allocation_status="Pending"
     )
 
     db.add(candidate)

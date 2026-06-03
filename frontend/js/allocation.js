@@ -1,106 +1,256 @@
-let scientists = [
-    { name:"Dr. Srinivasan", specialization:"artificial intelligence", assigned:[] },
-    { name:"Dr. Ananya Mehta", specialization:"cybersecurity", assigned:[] },
-    { name:"Dr. Vivek Sharma", specialization:"machine learning", assigned:[] },
-    { name:"Dr. Priya Nair", specialization:"computer vision", assigned:[] }
-];
-
-let interns = [
-    { name:"Rahul", skills:"machine learning", selected:true },
-    { name:"Simran", skills:"artificial intelligence", selected:true },
-    { name:"Aman", skills:"cybersecurity", selected:true }
-];
-
-function allocate(){
-    scientists.forEach(s=>s.assigned=[]);
-
-    interns.forEach(i=>{
-        if(!i.selected) return;
-
-        let sk=i.skills.toLowerCase();
-
-        for(let s of scientists){
-            if(sk.includes(s.specialization)){
-                s.assigned.push(i.name);
-                i.allotted=s.name;
-                break;
-            }
-        }
-    });
+let scientists = [];
+let candidates = [];
+async function loadScientists() {
+    try {
+        const scientistsResponse =
+            await fetch("/scientists");
+        scientists =
+            await scientistsResponse.json();
+        const candidatesResponse =
+            await fetch("/candidates");
+        candidates =
+            await candidatesResponse.json();
+        renderAllocation();
+    } catch (error) {
+        console.error(
+            "Failed to load allocation data:",
+            error
+        );
+    }
 }
+function renderAllocation() {
 
-function render(){
+    const container =
+        document.getElementById(
+            "allocationContainer"
+        );
 
-    allocate();
+    if (!container) {
+        return;
+    }
 
-    let q=document.getElementById("search").value?.toLowerCase() || "";
+    const searchInput =
+        document.getElementById(
+            "searchScientist"
+        );
 
-    const container=document.getElementById("container");
-    container.innerHTML="";
+    const searchValue =
+        searchInput
+            ? searchInput.value.toLowerCase()
+            : "";
 
-    scientists
-    .filter(s=>s.name.toLowerCase().includes(q))
-    .forEach(s=>{
+    const filteredScientists =
+        scientists.filter(scientist =>
 
-        container.innerHTML+=`
-        <div class="card">
+            scientist.name
+                .toLowerCase()
+                .includes(searchValue)
+        );
 
-            <h3>${s.name}</h3>
+    container.innerHTML = "";
 
-            <div class="badge">${s.specialization}</div>
+    filteredScientists.forEach(scientist => {
 
-            <p>Assigned: ${s.assigned.length}</p>
+        const assignedCandidates =
+    candidates.filter(candidate =>
 
-            <h4>Interns</h4>
+       (candidate.allotted_scientist || "")
+        ===scientist.name
+    );
 
-            <ul>
-                ${s.assigned.length
-                    ? s.assigned.map(i=>`<li>${i}</li>`).join("")
-                    : "<li>No interns assigned</li>"
-                }
-            </ul>
+const assignedList =
+    assignedCandidates.length > 0
 
-        </div>
+    ? assignedCandidates.map(candidate =>
+
+        `<li>${candidate.name}</li>`
+
+      ).join("")
+
+    : `<li class="empty-state">
+            No interns allocated
+       </li>`;
+
+        container.innerHTML += `
+
+            <div class="allocation-card">
+
+                <h3>
+                    ${scientist.name}
+                </h3>
+
+                <div class="specialization-badge">
+
+                    ${scientist.specialization}
+
+                </div>
+
+                <div class="assigned-count">
+
+                    Division:
+                    ${scientist.division}
+
+                </div>
+
+                <div class="assigned-count">
+                    Allocated:
+                    ${assignedCandidates.length}
+                    /
+                    ${scientist.maxInterns || 10}
+                </div>
+
+                <h4>
+                    Allocated Interns
+                </h4>
+
+                <ul class="intern-list">
+
+                    ${assignedList}
+
+                </ul>
+            </div>
         `;
     });
 }
 
-function openScientist(){
-    document.getElementById("scientistModal").style.display="flex";
+function openScientistModal() {
+
+    document.getElementById(
+        "scientistModal"
+    ).style.display = "flex";
 }
 
-function openIntern(){
-    document.getElementById("internModal").style.display="flex";
+function closeModals() {
+
+    document
+        .querySelectorAll(".modal")
+        .forEach(modal => {
+
+            modal.style.display =
+                "none";
+        });
 }
 
-function closeModal(){
-    document.querySelectorAll(".modal").forEach(m=>m.style.display="none");
+async function addScientist() {
+
+    const name =
+        document.getElementById(
+            "scientistName"
+        ).value.trim();
+
+    const specialization =
+        document.getElementById(
+            "scientistSpecialization"
+        ).value.trim();
+
+    const division =
+        document.getElementById(
+            "scientistDivision"
+        ).value.trim();
+
+    if (
+        !name ||
+        !specialization ||
+        !division
+    ) {
+
+        alert(
+            "Please fill all fields"
+        );
+
+        return;
+    }
+
+    const confirmed = confirm(
+
+        "Are you sure you want to create this scientist?\n\nThe scientist will immediately become available for future intern allocation."
+
+    );
+
+    if (!confirmed) {
+
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch(
+                "/scientists",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        name,
+
+                        specialization,
+
+                        division,
+
+                        maxInterns: 10
+                    })
+                }
+            );
+
+        const data =
+            await response.json();
+
+        alert(
+            data.message ||
+            "Scientist created successfully"
+        );
+
+        closeModals();
+
+        document.getElementById(
+            "scientistName"
+        ).value = "";
+
+        document.getElementById(
+            "scientistSpecialization"
+        ).value = "";
+
+        document.getElementById(
+            "scientistDivision"
+        ).value = "";
+
+        await loadScientists();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Failed to create scientist"
+        );
+    }
 }
 
-function addScientist(){
-    scientists.push({
-        name:sName.value,
-        specialization:sSpec.value,
-        assigned:[]
-    });
+function attachAllocationEvents() {
 
-    closeModal();
-    render();
+    const searchInput =
+        document.getElementById(
+            "searchScientist"
+        );
+
+    if (searchInput) {
+
+        searchInput.oninput =
+            renderAllocation;
+    }
 }
 
-function addIntern(){
-    interns.push({
-        name:iName.value,
-        skills:iSkills.value,
-        selected:true
-    });
+async function initializeAllocation() {
 
-    closeModal();
-    render();
+    attachAllocationEvents();
+
+    await loadScientists();
 }
 
-function load(){
-    render();
-}
-
-load();
+initializeAllocation();

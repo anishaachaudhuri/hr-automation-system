@@ -26,5 +26,17 @@ def candidate_to_dict(candidate):
         "top_semantic_chunk":
             candidate.top_semantic_chunk,
 
-        "reasons": candidate.reasons
+        "reasons": candidate.reasons,
+        
+        "allotted_scientist":
+            candidate.allotted_scientist,
+
+        "allotted_division":
+            candidate.allotted_division,
+
+        "allocation_reason":
+            candidate.allocation_reason,
+
+        "allocation_status":
+            candidate.allocation_status
     }

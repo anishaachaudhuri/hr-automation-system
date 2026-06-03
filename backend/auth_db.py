@@ -10,7 +10,8 @@ from backend.db import (
 from backend.models import (
     Base,
     Admin,
-    Requirement
+    Requirement,
+    Scientist
 )
 
 Base.metadata.create_all(
@@ -476,6 +477,96 @@ def update_requirements(data, username):
     )
 
     req.updated_by = username
+
+    db.commit()
+
+    db.close()
+
+def create_default_scientists():
+
+    db = SessionLocal()
+
+    existing = db.query(Scientist).first()
+
+    if existing:
+
+        db.close()
+        return
+
+    scientists = [
+
+        Scientist(
+            name="Dr. R. Srinivasan",
+            specialization="artificial intelligence",
+            division="AI & Intelligent Systems",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Ananya Mehta",
+            specialization="cybersecurity",
+            division="Cyber Defence Systems",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Vivek Sharma",
+            specialization="machine learning",
+            division="Machine Learning Research",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Priya Nair",
+            specialization="computer vision",
+            division="Vision & Image Processing",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Arvind Rao",
+            specialization="data science",
+            division="Data Analytics Division",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Sneha Kulkarni",
+            specialization="nlp",
+            division="Language Computing Systems",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Karan Malhotra",
+            specialization="cloud computing",
+            division="Distributed Computing Systems",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Neeraj Bhatia",
+            specialization="embedded systems",
+            division="Embedded & Real-Time Systems",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Ishita Verma",
+            specialization="web development",
+            division="Software Applications Group",
+            max_interns=10
+        ),
+
+        Scientist(
+            name="Dr. Aditya Kapoor",
+            specialization="network security",
+            division="Secure Network Systems",
+            max_interns=10
+        )
+    ]
+
+    db.add_all(scientists)
 
     db.commit()
 

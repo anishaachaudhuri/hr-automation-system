@@ -204,14 +204,20 @@ function attachEvents() {
 
     if (topKInput) {
 
-        topKInput.oninput =
-            function () {
+        topKInput.oninput = async function() {
 
-                topK =
-                    parseInt(this.value) || 3;
+            topK =
+                parseInt(this.value) || 3;
 
-                renderCandidates();
-            };
+            await fetch(
+                `/allocate-scientists?top_k=${topK}`,
+                {
+                    method: "POST"
+                }
+            );
+
+            await loadCandidates();
+        };
     }
 }
 
@@ -246,57 +252,6 @@ function getFilteredCandidates() {
     return filtered;
 }
 
-function allocateScientists() {
-
-    scientists.forEach(scientist => {
-
-        scientist.assigned = [];
-    });
-
-    const selectedCandidates =
-        candidates.filter(c => c.selected);
-
-    selectedCandidates.forEach(candidate => {
-
-        const candidateSkills =
-            candidate.skills
-                .toLowerCase();
-
-        for (let scientist of scientists) {
-
-            const hasMatchingSkill =
-                candidateSkills.includes(
-                    scientist.specialization
-                );
-
-            const hasCapacity =
-                scientist.assigned.length
-                < scientist.maxInterns;
-
-            if (
-                hasMatchingSkill &&
-                hasCapacity
-            ) {
-
-                scientist.assigned.push(
-                    candidate.name
-                );
-
-candidate.allottedScientist =
-    scientist.name;
-
-candidate.allottedDivision =
-    scientist.division;
-
-candidate.allocationReason =
-    `Matched with ${scientist.specialization}`;
-
-                break;
-            }
-        }
-    });
-}
-
 function renderCandidates() {
 
     const container =
@@ -307,7 +262,6 @@ function renderCandidates() {
     if (!container) {
         return;
     }
-    allocateScientists();
     const filtered =
         getFilteredCandidates();
 
@@ -440,15 +394,15 @@ function renderCardView(
         </h3>
 
 <p>
-    ${candidate.allottedScientist || "Not Allocated"}
+    ${candidate.allotted_scientist || "Not Allocated"}
 </p>
 
 <p>
-    ${candidate.allottedDivision || ""}
+    ${candidate.allotted_division || ""}
 </p>
 
 <p>
-    ${candidate.allocationReason || ""}
+    ${candidate.allocation_reason || ""}
 </p>
     </div>
 
@@ -563,7 +517,7 @@ function renderTableView(
                 </td>
 
                 <td>
-                   ${candidate.allottedScientist || "N/A"}
+                   ${candidate.allotted_scientist || "N/A"}
                 </td>
 
                 <td>
@@ -601,5 +555,4 @@ function renderTableView(
     container.innerHTML =
         tableHTML;
 }
-
 loadCandidates();

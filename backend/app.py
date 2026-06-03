@@ -1,7 +1,6 @@
 from unittest import result
-from backend.models import Candidate
+from backend.models import Candidate, AuditLog, Scientist
 from backend.audit import create_audit_log
-from backend.models import AuditLog
 from backend.serializers import (
     candidate_to_dict
 )
@@ -35,6 +34,7 @@ from backend.auth_db import (
     create_auth_tables,
     create_default_admin,
     create_default_requirements,
+    create_default_scientists,
     verify_admin,
     get_requirements,
     update_requirements
@@ -86,6 +86,8 @@ create_auth_tables()
 create_default_admin()
 
 create_default_requirements()
+
+create_default_scientists()
 
 UPLOAD_FOLDER = "data/resumes"
 
@@ -685,4 +687,144 @@ def clear_audit_logs():
     return {
         "message":
             "Audit logs deleted"
+    }
+
+@app.get("/scientists")
+def get_scientists():
+
+    db = get_connection()
+
+    scientists = db.query(
+        Scientist
+    ).all()
+
+    db.close()
+
+    return [
+
+        {
+            "id": s.id,
+            "name": s.name,
+            "specialization": s.specialization,
+            "division": s.division,
+            "maxInterns": s.max_interns
+        }
+
+        for s in scientists
+    ]
+
+@app.post("/scientists")
+def create_scientist(data: dict):
+
+    db = get_connection()
+
+    scientist = Scientist(
+
+        name=data["name"],
+
+        specialization=data["specialization"],
+
+        division=data["division"],
+
+        max_interns=data.get(
+            "maxInterns",
+            10
+        )
+    )
+
+    db.add(scientist)
+    db.commit()
+    db.close()
+    return {
+        "message":
+        "Scientist created"
+    }
+
+@app.post("/allocate-scientists")
+def allocate_scientists(top_k: int):
+
+    db = get_connection()
+
+    scientists = db.query(
+        Scientist
+    ).all()
+
+    candidates = db.query(
+        Candidate
+    ).filter(
+        Candidate.selected == True
+    ).order_by(
+        Candidate.score.desc()
+    ).all()
+
+    for candidate in candidates:
+
+        candidate.allotted_scientist = None
+
+        candidate.allotted_division = None
+
+        candidate.allocation_reason = None
+
+        candidate.allocation_status = (
+            "Outside Top-K"
+        )
+
+    top_candidates = candidates[:top_k]
+
+    for scientist in scientists:
+
+        scientist.current_count = 0
+
+    for candidate in top_candidates:
+
+        matched = False
+
+        candidate_skills = (
+            candidate.skills or ""
+        ).lower()
+
+        for scientist in scientists:
+
+            if scientist.current_count >= 10:
+
+                continue
+
+            if scientist.specialization.lower() in candidate_skills:
+
+                candidate.allotted_scientist = (
+                    scientist.name
+                )
+
+                candidate.allotted_division = (
+                    scientist.division
+                )
+
+                candidate.allocation_reason = (
+                    f"Matched with "
+                    f"{scientist.specialization}"
+                )
+
+                candidate.allocation_status = (
+                    "Allocated"
+                )
+
+                scientist.current_count += 1
+
+                matched = True
+
+                break
+
+        if not matched:
+
+            candidate.allocation_status = (
+                "No Matching Scientist"
+            )
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "message":
+            "Allocation completed"
     }
