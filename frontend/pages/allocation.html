@@ -1,26 +1,145 @@
-<div class="allocation-card">
+<!DOCTYPE html>
+<html lang="en">
 
-    <h1>
-        Intern Allocation System
-    </h1>
+<head>
+<meta charset="UTF-8">
+<title>AI Lab Allocation System</title>
 
-    <p>
-        Candidate-scientist allocation module.
-    </p>
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI;
+    background:#0a0f1c;
+    color:#fff;
+}
 
-    <div class="placeholder-box">
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px;
+    background:rgba(17,24,39,0.8);
+    backdrop-filter: blur(10px);
+    position:sticky;
+    top:0;
+}
 
-        <h3>
-            Future Features
-        </h3>
+.search{
+    padding:10px;
+    border-radius:8px;
+    border:none;
+    width:220px;
+}
 
-        <ul>
-            <li>Scientist Requirement Mapping</li>
-            <li>Capacity Constraints</li>
-            <li>Greedy Matching</li>
-            <li>Allocation Optimization</li>
-        </ul>
+button{
+    padding:10px 14px;
+    border:none;
+    border-radius:8px;
+    background:#3b82f6;
+    color:#fff;
+    cursor:pointer;
+    margin-left:8px;
+}
 
+.container{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:16px;
+    padding:20px;
+}
+
+.card{
+    background:rgba(30,41,59,0.9);
+    border:1px solid rgba(255,255,255,0.05);
+    border-radius:14px;
+    padding:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    transition:0.2s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.badge{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:6px;
+    background:#2563eb;
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+ul{padding-left:18px}
+
+.modal{
+    display:none;
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.6);
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-box{
+    background:#111827;
+    padding:20px;
+    border-radius:12px;
+    width:320px;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:none;
+}
+
+.topbar{
+    display:flex;
+    gap:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <h2>🧑‍🔬 AI Lab Allocation System</h2>
+
+    <div class="topbar">
+        <input class="search" id="search" placeholder="Search scientist..." oninput="render()">
+        <button onclick="openScientist()">+ Scientist</button>
+        <button onclick="openIntern()">+ Intern</button>
     </div>
-
 </div>
+
+<div id="container" class="container"></div>
+
+<!-- SCIENTIST MODAL -->
+<div class="modal" id="scientistModal">
+<div class="modal-box">
+<input id="sName" placeholder="Scientist Name">
+<input id="sSpec" placeholder="Specialization">
+<button onclick="addScientist()">Create</button>
+<button onclick="closeModal()">Close</button>
+</div>
+</div>
+
+<!-- INTERN MODAL -->
+<div class="modal" id="internModal">
+<div class="modal-box">
+<input id="iName" placeholder="Intern Name">
+<input id="iSkills" placeholder="Skills">
+<button onclick="addIntern()">Add</button>
+<button onclick="closeModal()">Close</button>
+</div>
+</div>
+
+<script src="/static/js/allocation.js"></script>
+
+</body>
+</html>
