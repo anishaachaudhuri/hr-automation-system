@@ -219,6 +219,35 @@ function attachEvents() {
             await loadCandidates();
         };
     }
+    const exportBtn =
+    document.getElementById(
+        "exportBtn"
+    );
+
+    if (exportBtn) {
+        exportBtn.onclick =
+            function () {
+                const dropdown =
+                    document.getElementById(
+                        "exportDropdown"
+                    );
+
+                dropdown.style.display =
+                    dropdown.style.display === "block"
+                    ? "none"
+                    : "block";
+            };
+    }
+    const downloadBtn =
+    document.getElementById(
+        "downloadCsvBtn"
+    );
+
+    if (downloadBtn) {
+
+        downloadBtn.onclick =
+            exportSelectedColumns;
+    }
 }
 
 function getFilteredCandidates() {
@@ -554,5 +583,67 @@ function renderTableView(
 
     container.innerHTML =
         tableHTML;
+}
+function exportSelectedColumns() {
+
+    const checkedColumns =
+
+        Array.from(
+            document.querySelectorAll(
+                "#exportDropdown input:checked"
+            )
+        )
+
+        .map(input => input.value);
+
+    if (
+        checkedColumns.length === 0
+    ) {
+
+        alert(
+            "Please select at least one column"
+        );
+
+        return;
+    }
+
+    let csv = "";
+
+    csv += checkedColumns.join(",");
+
+    csv += "\n";
+
+    candidates.forEach(candidate => {
+
+        const row =
+            checkedColumns.map(column => {
+
+                return (
+                    candidate[column] ?? ""
+                );
+            });
+
+        csv +=
+            row.join(",") + "\n";
+    });
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:"text/csv"
+            }
+        );
+
+    const link =
+        document.createElement("a");
+
+    link.href =
+        URL.createObjectURL(blob);
+
+    link.download =
+        "candidate-results.csv";
+
+    link.click();
 }
 loadCandidates();

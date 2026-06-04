@@ -16,10 +16,73 @@
 
         <div class="results-controls">
 
-            <button id="sortBtn">
-                Sort by Score
-            </button>
+            <div class="results-actions">
 
+                <button id="sortBtn">
+                    Sort by Score
+                </button>
+
+                <div class="export-wrapper">
+
+                    <button id="exportBtn">
+                        Export ▼
+                    </button>
+
+                    <div
+                        id="exportDropdown"
+                        class="export-dropdown"
+                        style="display:none;"
+                    >
+
+                        <label>
+                            <input type="checkbox" value="name" checked>
+                            Name
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="gpa" checked>
+                            GPA
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="score" checked>
+                            Score
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="selected" checked>
+                            Status
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="allotted_scientist" checked>
+                            Scientist
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="skills" checked>
+                            Skills
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="reasons" checked>
+                            Reasons
+                        </label>
+
+                        <label>
+                            <input type="checkbox" value="allocation_status" checked>
+                            Allocation Status
+                        </label>
+
+                        <button id="downloadCsvBtn">
+                            Export CSV
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
             <label>
 
                 Selected Only

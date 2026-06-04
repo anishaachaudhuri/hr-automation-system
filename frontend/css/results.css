@@ -49,6 +49,12 @@
     font-weight:600;
 }
 
+.results-actions{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
 .candidate-grid{
     display:grid;
 
@@ -240,4 +246,65 @@
 
 .delete-btn:hover{
     background:#b91c1c;
+}
+
+.export-wrapper{
+    position:relative;
+    display:inline-block;
+}
+
+.export-dropdown{
+
+    position:absolute;
+
+    top:55px;
+    left:0;
+
+    width:250px;
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:16px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.15);
+
+    z-index:100;
+}
+
+.export-dropdown label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    color:#334155;
+}
+
+#downloadCsvBtn{
+
+    width:100%;
+    margin-top:12px;
+}
+
+#exportBtn{
+
+    padding:14px 24px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#18489c;
+
+    color:white;
+
+    font-weight:600;
+
+    cursor:pointer;
+}
+#exportBtn{
+    background:red !important;
 }
