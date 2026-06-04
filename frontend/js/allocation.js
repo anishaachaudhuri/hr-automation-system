@@ -1,23 +1,36 @@
-let scientists = [];
-let candidates = [];
+window.allocationScientists =
+    window.allocationScientists || [];
+
+window.allocationCandidates =
+    window.allocationCandidates || [];
+
 async function loadScientists() {
+
     try {
+
         const scientistsResponse =
             await fetch("/scientists");
-        scientists =
+
+        allocationScientists =
             await scientistsResponse.json();
+
         const candidatesResponse =
             await fetch("/candidates");
-        candidates =
+
+        allocationCandidates =
             await candidatesResponse.json();
+
         renderAllocation();
+
     } catch (error) {
+
         console.error(
             "Failed to load allocation data:",
             error
         );
     }
 }
+
 function renderAllocation() {
 
     const container =
@@ -40,11 +53,13 @@ function renderAllocation() {
             : "";
 
     const filteredScientists =
-        scientists.filter(scientist =>
 
-            scientist.name
-                .toLowerCase()
-                .includes(searchValue)
+        allocationScientists.filter(
+            scientist =>
+
+                scientist.name
+                    .toLowerCase()
+                    .includes(searchValue)
         );
 
     container.innerHTML = "";
@@ -52,24 +67,27 @@ function renderAllocation() {
     filteredScientists.forEach(scientist => {
 
         const assignedCandidates =
-    candidates.filter(candidate =>
 
-       (candidate.allotted_scientist || "")
-        ===scientist.name
-    );
+            allocationCandidates.filter(
+                candidate =>
 
-const assignedList =
-    assignedCandidates.length > 0
+                    (candidate.allotted_scientist || "")
+                    === scientist.name
+            );
 
-    ? assignedCandidates.map(candidate =>
+        const assignedList =
 
-        `<li>${candidate.name}</li>`
+            assignedCandidates.length > 0
 
-      ).join("")
+            ? assignedCandidates.map(
+                candidate =>
 
-    : `<li class="empty-state">
-            No interns allocated
-       </li>`;
+                    `<li>${candidate.name}</li>`
+              ).join("")
+
+            : `<li class="empty-state">
+                    No interns allocated
+               </li>`;
 
         container.innerHTML += `
 
@@ -93,10 +111,12 @@ const assignedList =
                 </div>
 
                 <div class="assigned-count">
+
                     Allocated:
                     ${assignedCandidates.length}
                     /
                     ${scientist.maxInterns || 10}
+
                 </div>
 
                 <h4>
@@ -108,6 +128,7 @@ const assignedList =
                     ${assignedList}
 
                 </ul>
+
             </div>
         `;
     });
@@ -115,9 +136,16 @@ const assignedList =
 
 function openScientistModal() {
 
-    document.getElementById(
-        "scientistModal"
-    ).style.display = "flex";
+    const modal =
+        document.getElementById(
+            "scientistModal"
+        );
+
+    if (modal) {
+
+        modal.style.display =
+            "flex";
+    }
 }
 
 function closeModals() {
@@ -168,7 +196,6 @@ async function addScientist() {
     );
 
     if (!confirmed) {
-
         return;
     }
 
@@ -188,11 +215,8 @@ async function addScientist() {
                     body: JSON.stringify({
 
                         name,
-
                         specialization,
-
                         division,
-
                         maxInterns: 10
                     })
                 }

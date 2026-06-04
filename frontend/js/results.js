@@ -1,4 +1,5 @@
-let candidates = [];
+window.candidates =
+    window.candidates || [];
 
 let currentView = "card";
 

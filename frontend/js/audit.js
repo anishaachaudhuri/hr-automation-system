@@ -27,28 +27,53 @@ function attachAuditEvents() {
             "auditFilter"
         );
 
-    filter.onchange =
-        renderAuditLogs;
+    if (filter) {
 
-    document.getElementById(
-        "exportAuditCsv"
-    ).onclick = exportAuditCSV;
+        filter.onchange =
+            renderAuditLogs;
+    }
 
-    document.getElementById(
-        "exportAuditPdf"
-    ).onclick = exportAuditPDF;
+    const exportCsv =
+        document.getElementById(
+            "exportAuditCsv"
+        );
 
-    document.getElementById(
-        "deleteAuditsBtn"
-    ).onclick = clearAuditLogs;
+    if (exportCsv) {
+
+        exportCsv.onclick =
+            exportAuditCSV;
+    }
+
+    const exportPdf =
+        document.getElementById(
+            "exportAuditPdf"
+        );
+
+    if (exportPdf) {
+
+        exportPdf.onclick =
+            exportAuditPDF;
+    }
+
+    const deleteBtn =
+        document.getElementById(
+            "deleteAuditsBtn"
+        );
+
+    if (deleteBtn) {
+
+        deleteBtn.onclick =
+            clearAuditLogs;
+    }
 }
+
 async function clearAuditLogs() {
 
-    const confirmed =
-        confirm(
+    const confirmed = confirm(
 
-            "Are you sure you want to permanently clear all audit logs?\n\nThis action cannot be undone."
-        );
+        "Are you sure you want to permanently clear all audit logs?\n\nThis action cannot be undone."
+
+    );
 
     if (!confirmed) {
         return;
@@ -88,10 +113,19 @@ function renderAuditLogs() {
             "auditContainer"
         );
 
-    const filter =
+    if (!container) {
+        return;
+    }
+
+    const filterElement =
         document.getElementById(
             "auditFilter"
-        ).value;
+        );
+
+    const filter =
+        filterElement
+            ? filterElement.value
+            : "ALL";
 
     let filtered = auditLogs;
 
@@ -160,7 +194,9 @@ function exportAuditCSV() {
     const blob =
         new Blob(
             [csv],
-            { type: "text/csv" }
+            {
+                type: "text/csv"
+            }
         );
 
     const link =
@@ -177,9 +213,11 @@ function exportAuditCSV() {
 
 async function exportAuditPDF() {
 
-    const { jsPDF } = window.jspdf;
+    const { jsPDF } =
+        window.jspdf;
 
-    const pdf = new jsPDF();
+    const pdf =
+        new jsPDF();
 
     pdf.setFontSize(18);
 

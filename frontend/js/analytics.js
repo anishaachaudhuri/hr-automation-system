@@ -1,4 +1,5 @@
-let analyticsCandidates = [];
+window.analyticsCandidates =
+    window.analyticsCandidates || [];
 
 let analyticsChart = null;
 

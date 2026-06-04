@@ -13,7 +13,7 @@ async function loadPage(page) {
 
         const response =
             await fetch(
-                `/static/pages/${page}.html`
+                `/static/pages/${page}.html?v=${Date.now()}`
             );
 
         const html =
@@ -24,7 +24,7 @@ async function loadPage(page) {
 
         removeOldScripts();
 
-        loadPageScript(page);
+        await loadPageScript(page);
 
     } catch (error) {
 
@@ -50,77 +50,97 @@ function removeOldScripts() {
 
 function loadPageScript(page) {
 
-    let scriptPath = "";
+    return new Promise((resolve) => {
 
-    if (page === "analytics") {
+        let scriptPath = "";
 
-        scriptPath =
-            "/static/js/analytics.js";
-    }
+        if (page === "analytics") {
 
-    else if (page === "upload") {
+            scriptPath =
+                "/static/js/analytics.js";
+        }
 
-        scriptPath =
-            "/static/js/upload.js";
-    }
+        else if (page === "upload") {
 
-    else if (page === "results") {
+            scriptPath =
+                "/static/js/upload.js";
+        }
 
-        scriptPath =
-            "/static/js/results.js";
-    }
+        else if (page === "results") {
 
-    else if (
-        page === "requirements-login"
-    ) {
+            scriptPath =
+                "/static/js/results.js";
+        }
 
-        scriptPath =
-            "/static/js/requirements.js";
-    }
+        else if (
+            page === "requirements-login"
+        ) {
 
-    else if (
-        page === "requirements-dashboard"
-    ) {
+            scriptPath =
+                "/static/js/requirements.js";
+        }
 
-        scriptPath =
-            "/static/js/requirements.js";
-    }
+        else if (
+            page === "requirements-dashboard"
+        ) {
 
-    else if (page === "allocation") {
+            scriptPath =
+                "/static/js/requirements.js";
+        }
 
-        scriptPath =
-            "/static/js/allocation.js";
-    }
+        else if (page === "allocation") {
 
-    else if (page === "audit") {
+            scriptPath =
+                "/static/js/allocation.js";
+        }
 
-        scriptPath =
-            "/static/js/audit.js";
-    }
+        else if (page === "audit") {
 
-    if (scriptPath === "") {
-        return;
-    }
+            scriptPath =
+                "/static/js/audit.js";
+        }
 
-    const script =
-        document.createElement(
-            "script"
+        if (scriptPath === "") {
+
+            resolve();
+            return;
+        }
+
+        const script =
+            document.createElement(
+                "script"
+            );
+
+        script.className =
+            "dynamic-script";
+
+        script.src =
+            scriptPath;
+
+        script.onload = () => {
+
+            resolve();
+        };
+
+        script.onerror = () => {
+
+            console.error(
+                "Failed to load script:",
+                scriptPath
+            );
+
+            resolve();
+        };
+
+        document.body.appendChild(
+            script
         );
-
-    script.className =
-        "dynamic-script";
-
-    script.src =
-        scriptPath +
-        "?v=" +
-        Date.now();
-
-    document.body.appendChild(
-        script
-    );
+    });
 }
 
-window.onload = function () {
+window.onload = async function () {
 
-    loadPage("analytics");
+    await loadPage(
+        "analytics"
+    );
 };
