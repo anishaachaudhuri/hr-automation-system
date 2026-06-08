@@ -18,7 +18,7 @@ The system is designed for secure internal deployment and assists HR teams in re
 
 ![Candidate Results](assets/results.jpeg)
 
-## Scientist Intern Allocation
+## Candidate Evaluation
 
 ![Scientist Allocation](assets/eval.jpeg)
 
