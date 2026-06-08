@@ -150,12 +150,9 @@ Database Storage
       │
       └────────► Audit Logging
 ```
+![System Architecture](assets/system-architecture.jpg)
 
 ---
-
-# System Architecture
-
-![System Architecture](assets/system-architecture.jpg)
 
 
 # Technology Stack
