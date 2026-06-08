@@ -85,7 +85,6 @@ uploadBtn.addEventListener(
             const data =
                 await response.json();
 
-            // ZIP RESPONSE
             if (
                 file.name.endsWith(".zip")
             ) {
@@ -111,8 +110,6 @@ uploadBtn.addEventListener(
 
                 return;
             }
-
-            // SINGLE PDF RESPONSE
 
             status.innerHTML =
                 "Resume processed successfully";

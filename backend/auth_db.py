@@ -262,10 +262,6 @@ def update_requirements(data, username):
         data.get("achievementWeight", 0)
     )
 
-    # -------------------------
-    # AUDIT LOGGING
-    # -------------------------
-
     if req.minimum_gpa != new_minimum_gpa:
 
         create_audit_log(
